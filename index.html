@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ultimate Training">
+<meta name="theme-color" content="#F5F0E8">
+<title>ULTIMATE TRAINING</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #B8860B; --gold-light: #D4A820; --gold-dim: #8B6508;
+    --gold-bg: #FBF5E0; --bg: #F5F0E8; --surface: #FFFFFF;
+    --surface2: #F0EBE0; --border: #DDD5C0; --border-light: #EDE7D8;
+    --text: #1A1612; --text2: #3D3426; --muted: #8A7D68;
+    --green: #2E7D32; --red: #C62828;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Barlow',sans-serif; min-height:100vh; overflow-x:hidden; padding-bottom:calc(24px + var(--safe-bottom)); }
+
+  header { background:var(--surface); border-bottom:3px solid var(--gold); padding:0 20px; padding-top:var(--safe-top); position:sticky; top:0; z-index:100; display:flex; align-items:center; justify-content:space-between; height:calc(64px + var(--safe-top)); box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+  .logo { display:flex; align-items:center; gap:10px; }
+  .logo-icon { width:36px; height:36px; flex-shrink:0; }
+  .logo-text { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:3px; line-height:1; color:var(--text); }
+  .logo-sub { font-family:'Barlow Condensed',sans-serif; font-size:0.6rem; letter-spacing:4px; color:var(--gold); text-transform:uppercase; line-height:1; }
+  .header-right { display:flex; align-items:center; gap:10px; }
+  .sync-status { display:flex; align-items:center; gap:5px; font-family:'Barlow Condensed',sans-serif; font-size:0.68rem; letter-spacing:1px; color:var(--muted); text-transform:uppercase; }
+  .sync-dot { width:7px; height:7px; border-radius:50%; background:var(--muted); transition:background 0.3s; }
+  .sync-dot.online { background:var(--green); }
+  .sync-dot.syncing { background:var(--gold); animation:pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  .btn { font-family:'Barlow Condensed',sans-serif; font-size:0.75rem; letter-spacing:1.5px; text-transform:uppercase; padding:7px 14px; border:1.5px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; transition:all 0.2s; border-radius:4px; -webkit-tap-highlight-color:transparent; }
+  .btn-gold { background:var(--gold); color:#fff; border-color:var(--gold); font-weight:700; }
+  .btn-gold:active { background:var(--gold-light); }
+
+  .container { max-width:900px; margin:0 auto; padding:24px 16px; }
+
+  .prog-switcher { display:flex; gap:0; margin-bottom:22px; background:var(--surface2); border:1.5px solid var(--border); border-radius:8px; padding:4px; }
+  .prog-btn { flex:1; font-family:'Barlow Condensed',sans-serif; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase; padding:10px 8px; border:none; background:transparent; color:var(--muted); cursor:pointer; border-radius:5px; transition:all 0.2s; -webkit-tap-highlight-color:transparent; }
+  .prog-btn.active { background:var(--gold); color:#fff; font-weight:700; }
+
+  .week-nav { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:22px; }
+  .week-btn { font-family:'Barlow Condensed',sans-serif; font-size:0.73rem; letter-spacing:1px; padding:7px 12px; border:1.5px solid var(--border); background:var(--surface); color:var(--muted); cursor:pointer; transition:all 0.2s; border-radius:4px; -webkit-tap-highlight-color:transparent; }
+  .week-btn.active { background:var(--gold); color:#fff; border-color:var(--gold); font-weight:700; }
+  .week-btn.deload { color:var(--gold-dim); background:var(--gold-bg); }
+  .week-btn.deload.active { background:var(--gold-dim); border-color:var(--gold-dim); color:#fff; }
+
+  .progress-bar-wrap { margin-bottom:24px; }
+  .progress-label { display:flex; justify-content:space-between; font-family:'Barlow Condensed',sans-serif; font-size:0.7rem; letter-spacing:2px; color:var(--muted); margin-bottom:7px; text-transform:uppercase; }
+  .progress-bar { height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--gold-dim),var(--gold-light)); border-radius:2px; transition:width 0.5s ease; }
+
+  .week-header { margin-bottom:20px; display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap; }
+  .week-title { font-family:'Bebas Neue',sans-serif; font-size:2.8rem; line-height:1; letter-spacing:2px; }
+  .week-title span { color:var(--gold); }
+  .week-quote { font-style:italic; font-size:0.9rem; color:var(--muted); padding-bottom:4px; border-left:3px solid var(--gold); padding-left:12px; }
+  .deload-badge { display:inline-block; background:var(--gold-bg); color:var(--gold-dim); border:1px solid var(--gold-dim); font-family:'Barlow Condensed',sans-serif; font-size:0.6rem; letter-spacing:3px; padding:3px 8px; border-radius:3px; text-transform:uppercase; margin-left:10px; vertical-align:middle; }
+
+  .day-tabs { display:flex; margin-bottom:20px; border-bottom:2px solid var(--border); overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .day-tabs::-webkit-scrollbar { display:none; }
+  .day-tab { font-family:'Barlow Condensed',sans-serif; font-size:0.85rem; letter-spacing:1.5px; text-transform:uppercase; padding:12px 22px; border:none; background:transparent; color:var(--muted); cursor:pointer; transition:all 0.2s; position:relative; white-space:nowrap; -webkit-tap-highlight-color:transparent; }
+  .day-tab::after { content:''; position:absolute; bottom:-2px; left:0; right:0; height:2px; background:var(--gold); transform:scaleX(0); transition:transform 0.2s; }
+  .day-tab.active { color:var(--gold); font-weight:600; }
+  .day-tab.active::after { transform:scaleX(1); }
+
+  .workout-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; animation:fadeIn 0.25s ease; box-shadow:0 2px 16px rgba(0,0,0,0.06); }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+  .main-lift { background:linear-gradient(135deg,var(--gold-bg) 0%,var(--surface) 70%); border-bottom:2px solid var(--border); padding:22px; }
+  .section-label { font-family:'Barlow Condensed',sans-serif; font-size:0.63rem; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:10px; }
+  .main-lift-name { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:2px; margin-bottom:16px; color:var(--text); }
+  .main-lift-sub { font-family:'Barlow Condensed',sans-serif; font-size:0.8rem; letter-spacing:1px; color:var(--muted); margin-top:-10px; margin-bottom:4px; }
+
+  .sets-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .set-item { background:var(--surface2); border:1.5px solid var(--border-light); border-radius:8px; padding:12px; }
+  .set-item.set-peak { border-color:var(--gold); background:var(--gold-bg); }
+  .set-percent { font-family:'Barlow Condensed',sans-serif; font-size:0.72rem; letter-spacing:2px; color:var(--gold); margin-bottom:4px; font-weight:600; }
+  .set-reps { font-family:'Bebas Neue',sans-serif; font-size:1rem; color:var(--muted); margin-bottom:8px; }
+  .weight-input-wrap { position:relative; }
+  .weight-input { width:100%; background:var(--surface); border:1.5px solid var(--border); border-radius:6px; color:var(--text); font-family:'Bebas Neue',sans-serif; font-size:1.3rem; padding:8px 30px 8px 8px; outline:none; transition:border-color 0.2s; -webkit-appearance:none; }
+  .weight-input::placeholder { color:#ccc; }
+  .weight-input:focus { border-color:var(--gold); background:var(--gold-bg); }
+  .weight-input.has-value { border-color:var(--gold); color:var(--gold-dim); background:var(--gold-bg); }
+  .weight-unit { position:absolute; right:7px; top:50%; transform:translateY(-50%); font-family:'Barlow Condensed',sans-serif; font-size:0.6rem; color:var(--muted); pointer-events:none; }
+
+  .accessory-section { padding:20px; }
+  .accessory-label { font-family:'Barlow Condensed',sans-serif; font-size:0.63rem; letter-spacing:4px; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+  .exercise-row { display:flex; align-items:center; padding:10px 0; border-bottom:1px solid var(--border-light); gap:10px; }
+  .exercise-row:last-child { border-bottom:none; }
+  .ex-num { font-family:'Barlow Condensed',sans-serif; font-size:0.68rem; color:var(--gold); width:18px; flex-shrink:0; font-weight:600; }
+  .ex-name { font-family:'Barlow',sans-serif; font-size:0.9rem; font-weight:500; flex:1; color:var(--text2); }
+  .ex-sets { font-family:'Barlow Condensed',sans-serif; font-size:0.75rem; color:var(--muted); letter-spacing:1px; width:60px; text-align:center; flex-shrink:0; }
+  .ex-weight-wrap { position:relative; width:100px; flex-shrink:0; }
+  .ex-weight { width:100%; background:var(--surface2); border:1.5px solid var(--border); border-radius:5px; color:var(--text); font-family:'Bebas Neue',sans-serif; font-size:1.05rem; padding:7px 26px 7px 9px; outline:none; transition:all 0.2s; -webkit-appearance:none; }
+  .ex-weight:focus { border-color:var(--gold); background:var(--gold-bg); }
+  .ex-weight.has-value { border-color:var(--gold-dim); color:var(--gold-dim); background:var(--gold-bg); }
+  .ex-unit { position:absolute; right:7px; top:50%; transform:translateY(-50%); font-family:'Barlow Condensed',sans-serif; font-size:0.6rem; color:var(--muted); pointer-events:none; }
+
+  .notes-wrap { padding:16px 20px 22px; border-top:1px solid var(--border-light); background:var(--surface2); }
+  .notes-label { font-family:'Barlow Condensed',sans-serif; font-size:0.6rem; letter-spacing:3px; color:var(--muted); text-transform:uppercase; margin-bottom:8px; }
+  .notes-input { width:100%; background:var(--surface); border:1.5px solid var(--border); border-radius:6px; color:var(--text); font-family:'Barlow',sans-serif; font-size:0.85rem; padding:10px 12px; resize:vertical; min-height:64px; outline:none; transition:border-color 0.2s; }
+  .notes-input:focus { border-color:var(--gold); }
+  .notes-input::placeholder { color:#ccc; }
+
+  .oneRM-card { background:var(--surface); border:1px solid var(--border); border-top:4px solid var(--gold); border-radius:10px; padding:40px 28px; max-width:480px; margin:0 auto; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,0.07); }
+  .oneRM-title { font-family:'Bebas Neue',sans-serif; font-size:2.6rem; letter-spacing:4px; color:var(--gold); margin-bottom:6px; }
+  .oneRM-sub { color:var(--muted); font-size:0.86rem; margin-bottom:32px; }
+  .oneRM-lifts { display:flex; flex-direction:column; gap:16px; }
+  .oneRM-row { display:flex; align-items:center; gap:14px; }
+  .oneRM-lift-name { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:2px; width:110px; text-align:left; }
+  .oneRM-input-wrap { flex:1; position:relative; }
+  .oneRM-input { width:100%; background:var(--gold-bg); border:1.5px solid var(--border); border-radius:6px; color:var(--gold-dim); font-family:'Bebas Neue',sans-serif; font-size:1.8rem; padding:10px 44px 10px 16px; outline:none; text-align:right; transition:border-color 0.2s; -webkit-appearance:none; }
+  .oneRM-input:focus { border-color:var(--gold); }
+  .oneRM-unit { position:absolute; right:12px; top:50%; transform:translateY(-50%); font-family:'Barlow Condensed',sans-serif; font-size:0.78rem; color:var(--muted); }
+
+  .toast { position:fixed; bottom:calc(20px + var(--safe-bottom)); left:50%; transform:translateX(-50%) translateY(16px); background:var(--text); color:var(--surface); font-family:'Barlow Condensed',sans-serif; font-size:0.75rem; letter-spacing:2px; padding:10px 20px; border-radius:6px; opacity:0; transition:all 0.3s; z-index:999; white-space:nowrap; text-transform:uppercase; pointer-events:none; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .toast.green { background:var(--green); }
+
+  @media (max-width:480px) {
+    .week-title { font-size:2.2rem; }
+    .sets-grid { grid-template-columns:1fr; gap:8px; }
+    .set-item { display:flex; align-items:center; gap:12px; padding:10px 14px; }
+    .set-percent { margin-bottom:0; width:36px; flex-shrink:0; }
+    .set-reps { margin-bottom:0; width:32px; flex-shrink:0; }
+    .weight-input-wrap { flex:1; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="48" stroke="#B8860B" stroke-width="4"/>
+      <polygon points="50,15 75,35 75,65 50,85 25,65 25,35" stroke="#B8860B" stroke-width="3" fill="none"/>
+      <polygon points="50,25 68,40 68,60 50,75 32,60 32,40" fill="#B8860B" opacity="0.15"/>
+      <rect x="43" y="40" width="14" height="3" fill="#B8860B"/>
+      <rect x="43" y="48" width="14" height="3" fill="#B8860B"/>
+      <rect x="43" y="56" width="14" height="3" fill="#B8860B"/>
+    </svg>
+    <div>
+      <div class="logo-text">ULTIMATE TRAINING</div>
+      <div class="logo-sub">Premium Edition</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="sync-status">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncText">Laden...</span>
+    </div>
+    <button class="btn btn-gold" onclick="showWeek(13)">1RM</button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="prog-switcher">
+    <button class="prog-btn" id="btnKracht" onclick="switchProg('kracht')">💪 Kracht</button>
+    <button class="prog-btn active" id="btnHyper" onclick="switchProg('hyper')">🏋️ Hypertrofie</button>
+  </div>
+  <div class="week-nav" id="weekNav"></div>
+  <div class="progress-bar-wrap">
+    <div class="progress-label"><span>Voortgang</span><span id="progressText">Week 1 / 12</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:8.3%"></div></div>
+  </div>
+  <div id="weekContent"></div>
+  <div id="oneRMPage" style="display:none">
+    <div class="oneRM-card">
+      <div class="oneRM-title">FINALE 1RM TEST</div>
+      <div class="oneRM-sub">Vul je maximale gewichten in na het voltooien van het programma</div>
+      <div class="oneRM-lifts">
+        <div class="oneRM-row"><div class="oneRM-lift-name">SQUAT</div><div class="oneRM-input-wrap"><input type="number" class="oneRM-input" id="squat1RM" placeholder="0" oninput="save1RM('squat',this.value)" step="2.5" inputmode="decimal"><span class="oneRM-unit">KG</span></div></div>
+        <div class="oneRM-row"><div class="oneRM-lift-name">BENCH</div><div class="oneRM-input-wrap"><input type="number" class="oneRM-input" id="bench1RM" placeholder="0" oninput="save1RM('bench',this.value)" step="2.5" inputmode="decimal"><span class="oneRM-unit">KG</span></div></div>
+        <div class="oneRM-row"><div class="oneRM-lift-name">DEADLIFT</div><div class="oneRM-input-wrap"><input type="number" class="oneRM-input" id="deadlift1RM" placeholder="0" oninput="save1RM('deadlift',this.value)" step="2.5" inputmode="decimal"><span class="oneRM-unit">KG</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, enableIndexedDbPersistence }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCGuu-KRpAU3eClZGLGxMHi4J9yU3NpyyA",
+  authDomain: "ultimate-training-e9bd3.firebaseapp.com",
+  projectId: "ultimate-training-e9bd3",
+  storageBucket: "ultimate-training-e9bd3.firebasestorage.app",
+  messagingSenderId: "968143413971",
+  appId: "1:968143413971:web:876e3b7e6e7fd6147aaa26"
+};
+const fireApp = initializeApp(firebaseConfig);
+const db = getFirestore(fireApp);
+try { enableIndexedDbPersistence(db); } catch(e) {}
+
+// ======= KRACHT PROGRAM =======
+const KRACHT = {
+  1:{q:"Discipline creates freedom.",dl:false,A:{m:{n:"SQUAT",s:[["65%","x5"],["75%","x5"],["85%","x5"]],w:["130.0","150.0","170.0"]},a:[["Leg Press","4×12"],["Hamstring Curl","3×15"],["Seated Row","3×12"],["Face Pulls","3×15"],["Calf Raises","3×15"],["Abductor Machine","3×15"]]},B:{m:{n:"BENCH",s:[["65%","x5"],["75%","x5"],["85%","x5"]],w:["77.5","90.0","102.5"]},a:[["Incline DB Press","4×10"],["Chest Fly","3×15"],["Lateral Raises","3×20"],["Leg Extension","3×15"],["Walking Lunges","3×12/leg"],["Triceps Rope Pushdown","3×15"]]},C:{m:{n:"DEADLIFT",s:[["65%","x5"],["75%","x5"],["85%","x5"]],w:["142.5","165.0","187.5"]},a:[["Romanian Deadlift","3×10"],["Hip Thrust","4×10"],["Back Extensions","3×15"],["Seated Row (variation)","3×12"],["Lat Pulldown","4×12"],["Cable Crunch","3×15"]]}},
+  2:{q:"Strength is built one rep at a time.",dl:false,A:{m:{n:"SQUAT",s:[["70%","x3"],["80%","x3"],["90%","x3"]],w:["140.0","160.0","180.0"]},a:[["Leg Press","4×12"],["Hamstring Curl","3×15"],["Seated Row","3×12"],["Face Pulls","3×15"],["Calf Raises","3×15"],["Abductor Machine","3×15"]]},B:{m:{n:"BENCH",s:[["70%","x3"],["80%","x3"],["90%","x3"]],w:["85.0","95.0","107.5"]},a:[["Incline DB Press","4×10"],["Chest Fly","3×15"],["Lateral Raises","3×20"],["Leg Extension","3×15"],["Walking Lunges","3×12/leg"],["Triceps Rope Pushdown","3×15"]]},C:{m:{n:"DEADLIFT",s:[["70%","x3"],["80%","x3"],["90%","x3"]],w:["155.0","175.0","197.5"]},a:[["Romanian Deadlift","3×10"],["Hip Thrust","4×10"],["Back Extensions","3×15"],["Seated Row (variation)","3×12"],["Lat Pulldown","4×12"],["Cable Crunch","3×15"]]}},
+  3:{q:"Consistency beats intensity.",dl:false,A:{m:{n:"SQUAT",s:[["75%","x5"],["85%","x3"],["95%","x1+"]],w:["150.0","170.0","190.0"]},a:[["Leg Press","4×12"],["Hamstring Curl","3×15"],["Seated Row","3×12"],["Face Pulls","3×15"],["Calf Raises","3×15"],["Abductor Machine","3×15"]]},B:{m:{n:"BENCH",s:[["75%","x5"],["85%","x3"],["95%","x1+"]],w:["90.0","102.5","115.0"]},a:[["Incline DB Press","4×10"],["Chest Fly","3×15"],["Lateral Raises","3×20"],["Leg Extension","3×15"],["Walking Lunges","3×12/leg"],["Triceps Rope Pushdown","3×15"]]},C:{m:{n:"DEADLIFT",s:[["75%","x5"],["85%","x3"],["95%","x1+"]],w:["165.0","187.5","210.0"]},a:[["Romanian Deadlift","3×10"],["Hip Thrust","4×10"],["Back Extensions","3×15"],["Seated Row (variation)","3×12"],["Lat Pulldown","4×12"],["Cable Crunch","3×15"]]}},
+  4:{q:"Small steps create big change.",dl:true,A:{m:{n:"SQUAT",s:[["40%","x5"],["50%","x5"],["60%","x5"]],w:["80.0","100.0","120.0"]},a:[["Leg Press","4×12"],["Hamstring Curl","3×15"],["Seated Row","3×12"],["Face Pulls","3×15"],["Calf Raises","3×15"],["Abductor Machine","3×15"]]},B:{m:{n:"BENCH",s:[["40%","x5"],["50%","x5"],["60%","x5"]],w:["47.5","60.0","72.5"]},a:[["Incline DB Press","4×10"],["Chest Fly","3×15"],["Lateral Raises","3×20"],["Leg Extension","3×15"],["Walking Lunges","3×12/leg"],["Triceps Rope Pushdown","3×15"]]},C:{m:{n:"DEADLIFT",s:[["40%","x5"],["50%","x5"],["60%","x5"]],w:["87.5","110.0","132.5"]},a:[["Romanian Deadlift","3×10"],["Hip Thrust","4×10"],["Back Extensions","3×15"],["Seated Row (variation)","3×12"],["Lat Pulldown","4×12"],["Cable Crunch","3×15"]]}},
+  5:{q:"Success is earned, not given.",dl:false,A:{m:{n:"SQUAT",s:[["65%","x5"],["75%","x5"],["85%","x5"]],w:["130.0","150.0","170.0"]},a:[["Front Squat (light)","3×8"],["Bulgarian Split Squat","3×10/leg"],["Hamstring Curl","3×15"],["Chest Supported Row","3×12"],["Face Pulls","3×15"],["Calves Standing","4×15"]]},B:{m:{n:"BENCH",s:[["65%","x5"],["75%","x5"],["85%","x5"]],w:["77.5","90.0","102.5"]},a:[["Close Grip Bench","4×8"],["Incline DB Fly","3×12"],["Single Arm DB Shoulder Press","3×10/arm"],["Leg Extension (slow)","3×15"],["Step Ups","3×10/leg"],["Overhead Triceps Extension","3×12"]]},C:{m:{n:"DEADLIFT",s:[["65%","x5"],["75%","x5"],["85%","x5"]],w:["142.5","165.0","187.5"]},a:[["Deficit RDL","3×8"],["Hip Thrust","4×10"],["Reverse Hyper / Back Raise","3×15"],["Single Arm Row","3×10/arm"],["Pull Down Neutral Grip","4×12"],["Hanging Knee Raises","3×12"]]}},
+  6:{q:"Your mind is your strongest muscle.",dl:false,A:{m:{n:"SQUAT",s:[["70%","x3"],["80%","x3"],["90%","x3"]],w:["140.0","160.0","180.0"]},a:[["Front Squat (light)","3×8"],["Bulgarian Split Squat","3×10/leg"],["Hamstring Curl","3×15"],["Chest Supported Row","3×12"],["Face Pulls","3×15"],["Calves Standing","4×15"]]},B:{m:{n:"BENCH",s:[["70%","x3"],["80%","x3"],["90%","x3"]],w:["85.0","95.0","107.5"]},a:[["Close Grip Bench","4×8"],["Incline DB Fly","3×12"],["Single Arm DB Shoulder Press","3×10/arm"],["Leg Extension (slow)","3×15"],["Step Ups","3×10/leg"],["Overhead Triceps Extension","3×12"]]},C:{m:{n:"DEADLIFT",s:[["70%","x3"],["80%","x3"],["90%","x3"]],w:["155.0","175.0","197.5"]},a:[["Deficit RDL","3×8"],["Hip Thrust","4×10"],["Reverse Hyper / Back Raise","3×15"],["Single Arm Row","3×10/arm"],["Pull Down Neutral Grip","4×12"],["Hanging Knee Raises","3×12"]]}},
+  7:{q:"Progress over perfection.",dl:false,A:{m:{n:"SQUAT",s:[["75%","x5"],["85%","x3"],["95%","x1+"]],w:["150.0","170.0","190.0"]},a:[["Front Squat (light)","3×8"],["Bulgarian Split Squat","3×10/leg"],["Hamstring Curl","3×15"],["Chest Supported Row","3×12"],["Face Pulls","3×15"],["Calves Standing","4×15"]]},B:{m:{n:"BENCH",s:[["75%","x5"],["85%","x3"],["95%","x1+"]],w:["90.0","102.5","115.0"]},a:[["Close Grip Bench","4×8"],["Incline DB Fly","3×12"],["Single Arm DB Shoulder Press","3×10/arm"],["Leg Extension (slow)","3×15"],["Step Ups","3×10/leg"],["Overhead Triceps Extension","3×12"]]},C:{m:{n:"DEADLIFT",s:[["75%","x5"],["85%","x3"],["95%","x1+"]],w:["165.0","187.5","210.0"]},a:[["Deficit RDL","3×8"],["Hip Thrust","4×10"],["Reverse Hyper / Back Raise","3×15"],["Single Arm Row","3×10/arm"],["Pull Down Neutral Grip","4×12"],["Hanging Knee Raises","3×12"]]}},
+  8:{q:"Do what others won't.",dl:true,A:{m:{n:"SQUAT",s:[["40%","x5"],["50%","x5"],["60%","x5"]],w:["80.0","100.0","120.0"]},a:[["Front Squat (light)","3×8"],["Bulgarian Split Squat","3×10/leg"],["Hamstring Curl","3×15"],["Chest Supported Row","3×12"],["Face Pulls","3×15"],["Calves Standing","4×15"]]},B:{m:{n:"BENCH",s:[["40%","x5"],["50%","x5"],["60%","x5"]],w:["47.5","60.0","72.5"]},a:[["Close Grip Bench","4×8"],["Incline DB Fly","3×12"],["Single Arm DB Shoulder Press","3×10/arm"],["Leg Extension (slow)","3×15"],["Step Ups","3×10/leg"],["Overhead Triceps Extension","3×12"]]},C:{m:{n:"DEADLIFT",s:[["40%","x5"],["50%","x5"],["60%","x5"]],w:["87.5","110.0","132.5"]},a:[["Deficit RDL","3×8"],["Hip Thrust","4×10"],["Reverse Hyper / Back Raise","3×15"],["Single Arm Row","3×10/arm"],["Pull Down Neutral Grip","4×12"],["Hanging Knee Raises","3×12"]]}},
+  9:{q:"Stronger every day.",dl:false,A:{m:{n:"SQUAT",s:[["65%","x5"],["75%","x5"],["85%","x5"]],w:["130.0","150.0","170.0"]},a:[["Pause Squat (light)","3×5"],["Walking Lunges","3×12/leg"],["Leg Press","4×12"],["Pendlay Row (light)","3×8"],["Rear Delt Fly","3×15"],["Calf Press","4×15"]]},B:{m:{n:"BENCH",s:[["65%","x5"],["75%","x5"],["85%","x5"]],w:["77.5","90.0","102.5"]},a:[["Spoto Press","4×5"],["Incline Press","3×10"],["Cable Fly Low to High","3×12"],["Lateral Raise Mechanical Dropset","3×20"],["Sissy Squat or Quad ISO","3×12"],["Dips","3×AMRAP"]]},C:{m:{n:"DEADLIFT",s:[["65%","x5"],["75%","x5"],["85%","x5"]],w:["142.5","165.0","187.5"]},a:[["Tempo Deadlift (light)","3×5"],["Hip Thrust","4×8"],["Good Morning (light)","3×8"],["T-Bar Row","3×10"],["Wide Grip Pulldown","4×12"],["Cable Crunch","3×15"]]}},
+  10:{q:"You vs You.",dl:false,A:{m:{n:"SQUAT",s:[["70%","x3"],["80%","x3"],["90%","x3"]],w:["140.0","160.0","180.0"]},a:[["Pause Squat (light)","3×5"],["Walking Lunges","3×12/leg"],["Leg Press","4×12"],["Pendlay Row (light)","3×8"],["Rear Delt Fly","3×15"],["Calf Press","4×15"]]},B:{m:{n:"BENCH",s:[["70%","x3"],["80%","x3"],["90%","x3"]],w:["85.0","95.0","107.5"]},a:[["Spoto Press","4×5"],["Incline Press","3×10"],["Cable Fly Low to High","3×12"],["Lateral Raise Mechanical Dropset","3×20"],["Sissy Squat or Quad ISO","3×12"],["Dips","3×AMRAP"]]},C:{m:{n:"DEADLIFT",s:[["70%","x3"],["80%","x3"],["90%","x3"]],w:["155.0","175.0","197.5"]},a:[["Tempo Deadlift (light)","3×5"],["Hip Thrust","4×8"],["Good Morning (light)","3×8"],["T-Bar Row","3×10"],["Wide Grip Pulldown","4×12"],["Cable Crunch","3×15"]]}},
+  11:{q:"Champions suffer once.",dl:false,A:{m:{n:"SQUAT",s:[["75%","x5"],["85%","x3"],["95%","x1+"]],w:["150.0","170.0","190.0"]},a:[["Pause Squat (light)","3×5"],["Walking Lunges","3×12/leg"],["Leg Press","4×12"],["Pendlay Row (light)","3×8"],["Rear Delt Fly","3×15"],["Calf Press","4×15"]]},B:{m:{n:"BENCH",s:[["75%","x5"],["85%","x3"],["95%","x1+"]],w:["90.0","102.5","115.0"]},a:[["Spoto Press","4×5"],["Incline Press","3×10"],["Cable Fly Low to High","3×12"],["Lateral Raise Mechanical Dropset","3×20"],["Sissy Squat or Quad ISO","3×12"],["Dips","3×AMRAP"]]},C:{m:{n:"DEADLIFT",s:[["75%","x5"],["85%","x3"],["95%","x1+"]],w:["165.0","187.5","210.0"]},a:[["Tempo Deadlift (light)","3×5"],["Hip Thrust","4×8"],["Good Morning (light)","3×8"],["T-Bar Row","3×10"],["Wide Grip Pulldown","4×12"],["Cable Crunch","3×15"]]}},
+  12:{q:"Push for tomorrow.",dl:true,A:{m:{n:"SQUAT",s:[["40%","x5"],["50%","x5"],["60%","x5"]],w:["80.0","100.0","120.0"]},a:[["Pause Squat (light)","3×5"],["Walking Lunges","3×12/leg"],["Leg Press","4×12"],["Pendlay Row (light)","3×8"],["Rear Delt Fly","3×15"],["Calf Press","4×15"]]},B:{m:{n:"BENCH",s:[["40%","x5"],["50%","x5"],["60%","x5"]],w:["47.5","60.0","72.5"]},a:[["Spoto Press","4×5"],["Incline Press","3×10"],["Cable Fly Low to High","3×12"],["Lateral Raise Mechanical Dropset","3×20"],["Sissy Squat or Quad ISO","3×12"],["Dips","3×AMRAP"]]},C:{m:{n:"DEADLIFT",s:[["40%","x5"],["50%","x5"],["60%","x5"]],w:["87.5","110.0","132.5"]},a:[["Tempo Deadlift (light)","3×5"],["Hip Thrust","4×8"],["Good Morning (light)","3×8"],["T-Bar Row","3×10"],["Wide Grip Pulldown","4×12"],["Cable Crunch","3×15"]]}}
+};
+
+// ======= HYPERTROFIE PPL PROGRAM =======
+const HYPER = {
+  1:{q:"Spiergroei begint met consistentie.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","4×8-10"],["Incline DB Press","3×10-12"],["Lateral Raises","4×15-20"],["Cable Fly (laag naar hoog)","3×12-15"],["Overhead Triceps Extension","3×12-15"],["Triceps Rope Pushdown","3×15"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","4×8-10"],["Lat Pulldown","4×10-12"],["Seated Cable Row","3×12"],["Face Pulls","3×20"],["Incline DB Curl","3×12-15"],["Hammer Curl","3×15"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","4×8-10"],["Romanian Deadlift","3×10-12"],["Leg Press","3×12-15"],["Leg Extension","3×15"],["Hamstring Curl","3×15"],["Calf Raises","4×20"]]}},
+  2:{q:"Volume is de sleutel tot groei.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","4×8-10"],["Incline DB Press","3×10-12"],["Lateral Raises","4×15-20"],["Cable Fly (laag naar hoog)","3×12-15"],["Overhead Triceps Extension","3×12-15"],["Triceps Rope Pushdown","3×15"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","4×8-10"],["Lat Pulldown","4×10-12"],["Seated Cable Row","3×12"],["Face Pulls","3×20"],["Incline DB Curl","3×12-15"],["Hammer Curl","3×15"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","4×8-10"],["Romanian Deadlift","3×10-12"],["Leg Press","3×12-15"],["Leg Extension","3×15"],["Hamstring Curl","3×15"],["Calf Raises","4×20"]]}},
+  3:{q:"Elke set telt. Elke rep telt.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","4×8-10"],["Incline DB Press","4×10-12"],["Lateral Raises","4×15-20"],["Cable Fly (laag naar hoog)","3×12-15"],["Overhead Triceps Extension","3×12-15"],["Triceps Rope Pushdown","3×15"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","4×8-10"],["Lat Pulldown","4×10-12"],["Seated Cable Row","4×12"],["Face Pulls","3×20"],["Incline DB Curl","3×12-15"],["Hammer Curl","3×15"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","4×8-10"],["Romanian Deadlift","4×10-12"],["Leg Press","3×12-15"],["Leg Extension","3×15"],["Hamstring Curl","3×15"],["Calf Raises","4×20"]]}},
+  4:{q:"Herstel is ook training.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","3×10-12"],["Incline DB Press","3×12"],["Lateral Raises","3×15"],["Cable Fly (laag naar hoog)","3×15"],["Overhead Triceps Extension","2×15"],["Triceps Rope Pushdown","2×15"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","3×10"],["Lat Pulldown","3×12"],["Seated Cable Row","3×12"],["Face Pulls","3×20"],["Incline DB Curl","2×15"],["Hammer Curl","2×15"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","3×10"],["Romanian Deadlift","3×12"],["Leg Press","3×15"],["Leg Extension","2×15"],["Hamstring Curl","2×15"],["Calf Raises","3×20"]]}},
+  5:{q:"Zwaarder. Sterker. Groter.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","4×6-8"],["Incline DB Press","4×8-10"],["Lateral Raises","4×15-20"],["Cable Fly (laag naar hoog)","3×10-12"],["Overhead Triceps Extension","3×10-12"],["Triceps Rope Pushdown","3×12"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","4×6-8"],["Lat Pulldown","4×8-10"],["Seated Cable Row","4×10"],["Face Pulls","4×20"],["Incline DB Curl","3×10-12"],["Hammer Curl","3×12"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","4×6-8"],["Romanian Deadlift","4×8-10"],["Leg Press","4×10-12"],["Leg Extension","3×12"],["Hamstring Curl","3×12"],["Calf Raises","4×20"]]}},
+  6:{q:"Progressie is geen toeval.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","4×6-8"],["Incline DB Press","4×8-10"],["Lateral Raises","4×15-20"],["Cable Fly (laag naar hoog)","3×10-12"],["Overhead Triceps Extension","3×10-12"],["Triceps Rope Pushdown","3×12"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","4×6-8"],["Lat Pulldown","4×8-10"],["Seated Cable Row","4×10"],["Face Pulls","4×20"],["Incline DB Curl","3×10-12"],["Hammer Curl","3×12"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","4×6-8"],["Romanian Deadlift","4×8-10"],["Leg Press","4×10-12"],["Leg Extension","3×12"],["Hamstring Curl","3×12"],["Calf Raises","4×20"]]}},
+  7:{q:"Jij vs gisteren. Win elke dag.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","5×6-8"],["Incline DB Press","4×8-10"],["Lateral Raises","4×15-20"],["Cable Fly (laag naar hoog)","3×10-12"],["Overhead Triceps Extension","3×10-12"],["Triceps Rope Pushdown","3×12"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","5×6-8"],["Lat Pulldown","4×8-10"],["Seated Cable Row","4×10"],["Face Pulls","4×20"],["Incline DB Curl","3×10-12"],["Hammer Curl","3×12"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","5×6-8"],["Romanian Deadlift","4×8-10"],["Leg Press","4×10-12"],["Leg Extension","3×12"],["Hamstring Curl","3×12"],["Calf Raises","4×20"]]}},
+  8:{q:"Rust is deel van het plan.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","3×10"],["Incline DB Press","3×12"],["Lateral Raises","3×15"],["Cable Fly (laag naar hoog)","3×15"],["Overhead Triceps Extension","2×15"],["Triceps Rope Pushdown","2×15"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","3×10"],["Lat Pulldown","3×12"],["Seated Cable Row","3×12"],["Face Pulls","3×20"],["Incline DB Curl","2×15"],["Hammer Curl","2×15"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","3×10"],["Romanian Deadlift","3×12"],["Leg Press","3×15"],["Leg Extension","2×15"],["Hamstring Curl","2×15"],["Calf Raises","3×20"]]}},
+  9:{q:"De laatste fase. Alles geven.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","5×5-8"],["Incline DB Press","4×8-10"],["Lateral Raises","5×15-20"],["Cable Fly (laag naar hoog)","4×10-12"],["Overhead Triceps Extension","4×10-12"],["Triceps Rope Pushdown","4×12"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","5×5-8"],["Lat Pulldown","4×8-10"],["Seated Cable Row","4×10"],["Face Pulls","4×20"],["Incline DB Curl","4×10-12"],["Hammer Curl","4×12"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","5×5-8"],["Romanian Deadlift","4×8-10"],["Leg Press","4×10-12"],["Leg Extension","4×12"],["Hamstring Curl","4×12"],["Calf Raises","5×20"]]}},
+  10:{q:"Maximum volume. Maximum resultaat.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","5×5-8"],["Incline DB Press","4×8-10"],["Lateral Raises","5×15-20"],["Cable Fly (laag naar hoog)","4×10-12"],["Overhead Triceps Extension","4×10-12"],["Triceps Rope Pushdown","4×12"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","5×5-8"],["Lat Pulldown","4×8-10"],["Seated Cable Row","4×10"],["Face Pulls","4×20"],["Incline DB Curl","4×10-12"],["Hammer Curl","4×12"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","5×5-8"],["Romanian Deadlift","4×8-10"],["Leg Press","4×10-12"],["Leg Extension","4×12"],["Hamstring Curl","4×12"],["Calf Raises","5×20"]]}},
+  11:{q:"Nog twee weken. Geef alles.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","5×5-8"],["Incline DB Press","5×8-10"],["Lateral Raises","5×15-20"],["Cable Fly (laag naar hoog)","4×10-12"],["Overhead Triceps Extension","4×10-12"],["Triceps Rope Pushdown","4×12"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","5×5-8"],["Lat Pulldown","5×8-10"],["Seated Cable Row","4×10"],["Face Pulls","4×20"],["Incline DB Curl","4×10-12"],["Hammer Curl","4×12"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","5×5-8"],["Romanian Deadlift","5×8-10"],["Leg Press","4×10-12"],["Leg Extension","4×12"],["Hamstring Curl","4×12"],["Calf Raises","5×20"]]}},
+  12:{q:"Laatste week. Laat zien wie je bent.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","5×5-8"],["Incline DB Press","5×8-10"],["Lateral Raises","5×15-20"],["Cable Fly (laag naar hoog)","4×10-12"],["Overhead Triceps Extension","4×10-12"],["Triceps Rope Pushdown","4×12"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","5×5-8"],["Lat Pulldown","5×8-10"],["Seated Cable Row","4×10"],["Face Pulls","4×20"],["Incline DB Curl","4×10-12"],["Hammer Curl","4×12"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","5×5-8"],["Romanian Deadlift","5×8-10"],["Leg Press","4×10-12"],["Leg Extension","4×12"],["Hamstring Curl","4×12"],["Calf Raises","5×20"]]}}
+};
+
+// ======= STATE =======
+let activeProg = 'hyper';
+let cW = 1, cD = 'A';
+let localData = {}, syncTimer = null;
+
+function getProg() { return activeProg === 'hyper' ? HYPER : KRACHT; }
+function loadLocal() { try { const r = localStorage.getItem('ut_v2'); if(r) localData = JSON.parse(r); } catch(e){} }
+function saveLocal() { try { localStorage.setItem('ut_v2', JSON.stringify(localData)); } catch(e){} }
+function get(k) { return localData[k] || ''; }
+function set(k, v) { localData[k] = v; saveLocal(); debouncedSync(); }
+
+function setSync(s) {
+  const dot = document.getElementById('syncDot'), txt = document.getElementById('syncText');
+  dot.className = 'sync-dot ' + s;
+  txt.textContent = s==='online' ? 'Gesync' : s==='syncing' ? 'Syncing...' : 'Offline';
+}
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type} show`;
+  clearTimeout(window._tt); window._tt = setTimeout(() => t.className = 'toast', 2500);
+}
+async function syncUp() {
+  setSync('syncing');
+  try {
+    await setDoc(doc(db,'training','user_data'), {data:localData, updatedAt:new Date().toISOString()});
+    setSync('online'); showToast('✓ Gesynchroniseerd','green');
+  } catch(e) { setSync('offline'); }
+}
+async function syncDown() {
+  setSync('syncing');
+  try {
+    const snap = await getDoc(doc(db,'training','user_data'));
+    if(snap.exists()) { localData = {...localData, ...(snap.data().data||{})}; saveLocal(); }
+    setSync('online');
+  } catch(e) { setSync('offline'); }
+  buildNav(); renderWeek();
+}
+function debouncedSync() { clearTimeout(syncTimer); syncTimer = setTimeout(syncUp, 1500); }
+
+// ======= PROGRAM SWITCHER =======
+window.switchProg = function(prog) {
+  activeProg = prog;
+  localStorage.setItem('ut_active_prog', prog);
+  cW = loadCurrentWeek();
+  cD = 'A';
+  document.getElementById('btnKracht').classList.toggle('active', prog === 'kracht');
+  document.getElementById('btnHyper').classList.toggle('active', prog === 'hyper');
+  document.getElementById('weekContent').style.display = 'block';
+  document.getElementById('oneRMPage').style.display = 'none';
+  document.getElementById('progressText').textContent = 'Week 1 / 12';
+  document.getElementById('progressFill').style.width = '8.3%';
+  buildNav(); renderWeek();
+};
+
+// ======= NAV =======
+function buildNav() {
+  const nav = document.getElementById('weekNav');
+  nav.innerHTML = '';
+  const prog = getProg();
+  for(let w = 1; w <= 12; w++) {
+    const b = document.createElement('button');
+    const isDeload = prog[w] && prog[w].dl;
+    b.className = `week-btn${isDeload?' deload':''}${w===cW?' active':''}`;
+    b.textContent = `W${w}${isDeload?' ·D':''}`;
+    b.onclick = () => showWeek(w);
+    nav.appendChild(b);
+  }
+  const b = document.createElement('button');
+  b.className = 'week-btn' + (cW===13?' active':'');
+  b.style.borderColor = '#B8860B';
+  b.textContent = '🏆 1RM';
+  b.onclick = () => showWeek(13);
+  nav.appendChild(b);
+}
+
+window.showWeek = function(w) {
+  cW = w;
+  if (w <= 12) { localStorage.setItem('ut_cur_w_' + activeProg, w); }
+  buildNav();
+  if(w === 13) {
+    document.getElementById('weekContent').style.display = 'none';
+    document.getElementById('oneRMPage').style.display = 'block';
+    document.getElementById('progressText').textContent = 'Finale';
+    document.getElementById('progressFill').style.width = '100%';
+    ['squat','bench','deadlift'].forEach(l => {
+      const el = document.getElementById(l+'1RM'); if(el) el.value = get('1rm_'+l);
+    });
+    return;
+  }
+  document.getElementById('weekContent').style.display = 'block';
+  document.getElementById('oneRMPage').style.display = 'none';
+  document.getElementById('progressText').textContent = `Week ${w} / 12`;
+  document.getElementById('progressFill').style.width = `${(w/12)*100}%`;
+  renderWeek();
+};
+
+// ======= RENDER =======
+function renderWeek() {
+  const prog = getProg();
+  const wk = prog[cW]; if(!wk) return;
+  const isHyper = activeProg === 'hyper';
+  const badge = wk.dl ? '<span class="deload-badge">Deload</span>' : '';
+  const tabA = isHyper ? 'Push' : 'A · Squat';
+  const tabB = isHyper ? 'Pull' : 'B · Bench';
+  const tabC = isHyper ? 'Legs' : 'C · Deadlift';
+  document.getElementById('weekContent').innerHTML = `
+    <div class="week-header">
+      <div class="week-title"><span>WEEK</span> ${cW}${badge}</div>
+      <div class="week-quote">${wk.q}</div>
+    </div>
+    <div class="day-tabs">
+      <button class="day-tab${cD==='A'?' active':''}" onclick="switchDay('A')">${tabA}</button>
+      <button class="day-tab${cD==='B'?' active':''}" onclick="switchDay('B')">${tabB}</button>
+      <button class="day-tab${cD==='C'?' active':''}" onclick="switchDay('C')">${tabC}</button>
+    </div>
+    <div id="dayContent"></div>`;
+  renderDay();
+  addNextWeekBtn();
+}
+
+window.switchDay = function(d) { cD = d; renderWeek(); };
+
+function renderDay() {
+  const prog = getProg();
+  const day = prog[cW][cD];
+  const isHyper = activeProg === 'hyper';
+  const prefix = isHyper ? 'h' : 'k';
+  const w = cW, d = cD;
+
+  let mainHtml = '';
+  if (!isHyper && day.m) {
+    const sets = day.m.s.map(([pct,reps], i) => {
+      const k = `${prefix}_w${w}_${d}_m_${i}`, sv = get(k) || getWeight(prefix, w, d, 'm', i);
+      return `<div class="set-item${i===2?' set-peak':''}">
+        <div class="set-percent">${pct}</div>
+        <div class="set-reps">${reps}</div>
+        <div class="weight-input-wrap">
+          <input type="number" class="weight-input${sv?' has-value':''}" placeholder="${day.m.w[i]}" value="${sv}" oninput="inp(this,'${k}')" step="2.5" inputmode="decimal">
+          <span class="weight-unit">KG</span>
+        </div>
+      </div>`;
+    }).join('');
+    mainHtml = `<div class="main-lift">
+      <div class="section-label">▶ HOOFDLIFT</div>
+      <div class="main-lift-name">${day.m.n}</div>
+      <div class="sets-grid">${sets}</div>
+    </div>`;
+  } else if (isHyper) {
+    mainHtml = `<div class="main-lift">
+      <div class="section-label">▶ TRAINING</div>
+      <div class="main-lift-name">${day.n}</div>
+      <div class="main-lift-sub">${day.s}</div>
+    </div>`;
+  }
+
+  const acc = day.a.map(([name, sets], i) => {
+    const k = `${prefix}_w${w}_${d}_a_${i}`, sv = get(k) || getWeight(prefix, w, d, 'a', i);
+    return `<div class="exercise-row">
+      <span class="ex-num">${i+1}</span>
+      <span class="ex-name">${name}</span>
+      <span class="ex-sets">${sets}</span>
+      <div class="ex-weight-wrap">
+        <input type="number" class="ex-weight${sv?' has-value':''}" placeholder="—" value="${sv}" oninput="inp(this,'${k}')" step="2.5" inputmode="decimal">
+        <span class="ex-unit">KG</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  const nk = `${prefix}_w${w}_${d}_n`, ns = get(nk);
+  document.getElementById('dayContent').innerHTML = `
+    <div class="workout-card">
+      ${mainHtml}
+      <div class="accessory-section">
+        <div class="accessory-label">▶ OEFENINGEN</div>
+        ${acc}
+      </div>
+      <div class="notes-wrap">
+        <div class="notes-label">Notities</div>
+        <textarea class="notes-input" placeholder="Hoe voelde de training? PR's? Opmerkingen..." oninput="inp(this,'${nk}')">${ns}</textarea>
+      </div>
+    </div>`;
+}
+
+window.inp = function(el, k) {
+  set(k, el.value);
+  if(el.classList.contains('weight-input') || el.classList.contains('ex-weight'))
+    el.classList.toggle('has-value', el.value.length > 0);
+};
+window.save1RM = function(lift, v) { set('1rm_'+lift, v); };
+
+// ======= SMART WEEK MEMORY =======
+function saveCurrentWeek() {
+  localStorage.setItem('ut_cur_w_' + activeProg, cW);
+}
+
+function loadCurrentWeek() {
+  const saved = localStorage.getItem('ut_cur_w_' + activeProg);
+  return saved ? parseInt(saved) : 1;
+}
+
+// ======= WEIGHT CARRY-OVER =======
+// Get weight from current or any previous week
+function getWeight(prefix, w, d, type, i) {
+  // First check current week
+  const key = `${prefix}_w${w}_${d}_${type}_${i}`;
+  if (localData[key]) return localData[key];
+  // Look back up to 11 weeks for the last entered value
+  for (let prev = w - 1; prev >= 1; prev--) {
+    const prevKey = `${prefix}_w${prev}_${d}_${type}_${i}`;
+    if (localData[prevKey]) return localData[prevKey];
+  }
+  return '';
+}
+
+// ======= NEXT WEEK BUTTON =======
+function addNextWeekBtn() {
+  const existing = document.getElementById('nextWeekBtn');
+  if (existing) existing.remove();
+  if (cW >= 12) return;
+  const btn = document.createElement('button');
+  btn.id = 'nextWeekBtn';
+  btn.style.cssText = 'width:100%;margin-top:16px;background:var(--gold);color:#fff;border:none;border-radius:8px;font-family:Bebas Neue,sans-serif;font-size:1.1rem;letter-spacing:3px;padding:16px;cursor:pointer;-webkit-tap-highlight-color:transparent;';
+  btn.textContent = `▶ NAAR WEEK ${cW + 1}`;
+  btn.onclick = () => {
+    showWeek(cW + 1);
+    saveCurrentWeek();
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  };
+  document.getElementById('weekContent').appendChild(btn);
+}
+
+// ======= INIT =======
+loadLocal();
+// Restore last active program and week
+const savedProg = localStorage.getItem('ut_active_prog');
+if (savedProg) {
+  activeProg = savedProg;
+  document.getElementById('btnKracht').classList.toggle('active', activeProg === 'kracht');
+  document.getElementById('btnHyper').classList.toggle('active', activeProg === 'hyper');
+}
+cW = loadCurrentWeek();
+syncDown();
+</script>
+</body>
+</html>
