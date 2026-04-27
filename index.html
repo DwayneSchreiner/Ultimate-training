@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ultimate Training">
+<meta name="theme-color" content="#F5F0E8">
+<title>ULTIMATE TRAINING</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #B8860B; --gold-light: #D4A820; --gold-dim: #8B6508;
+  --gold-bg: #FBF5E0; --bg: #F5F0E8; --surface: #FFFFFF;
+  --surface2: #F0EBE0; --border: #DDD5C0; --border-light: #EDE7D8;
+  --text: #1A1612; --text2: #3D3426; --muted: #8A7D68;
+  --green: #2E7D32; --red: #C62828; --blue: #1565C0;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Barlow',sans-serif; min-height:100vh; overflow-x:hidden; padding-bottom:calc(80px + var(--safe-bottom)); }
+
+/* HEADER */
+header { background:var(--surface); border-bottom:3px solid var(--gold); padding:0 20px; padding-top:var(--safe-top); position:sticky; top:0; z-index:100; display:flex; align-items:center; justify-content:space-between; height:calc(60px + var(--safe-top)); box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+.logo { display:flex; align-items:center; gap:10px; }
+.logo-icon { width:32px; height:32px; flex-shrink:0; }
+.logo-text { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:3px; line-height:1; color:var(--text); }
+.logo-sub { font-family:'Barlow Condensed',sans-serif; font-size:0.55rem; letter-spacing:4px; color:var(--gold); text-transform:uppercase; line-height:1; }
+
+/* BOTTOM NAV */
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:var(--surface); border-top:2px solid var(--border); display:flex; z-index:100; padding-bottom:var(--safe-bottom); box-shadow:0 -4px 16px rgba(0,0,0,0.08); }
+.nav-btn { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px 4px; border:none; background:transparent; color:var(--muted); cursor:pointer; transition:all 0.2s; -webkit-tap-highlight-color:transparent; font-family:'Barlow Condensed',sans-serif; font-size:0.62rem; letter-spacing:1.5px; text-transform:uppercase; gap:4px; }
+.nav-btn .nav-icon { font-size:1.4rem; line-height:1; }
+.nav-btn.active { color:var(--gold); }
+.nav-btn.active .nav-icon { transform:scale(1.1); }
+
+/* CONTAINER */
+.container { max-width:900px; margin:0 auto; padding:20px 16px; }
+.tab-page { display:none; }
+.tab-page.active { display:block; }
+
+/* CARDS */
+.card { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:16px; box-shadow:0 2px 12px rgba(0,0,0,0.05); }
+.card-header { background:linear-gradient(135deg,var(--gold-bg) 0%,var(--surface) 70%); border-bottom:2px solid var(--border); padding:18px 20px; }
+.card-label { font-family:'Barlow Condensed',sans-serif; font-size:0.63rem; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:6px; }
+.card-title { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:2px; color:var(--text); line-height:1; }
+.card-sub { font-family:'Barlow Condensed',sans-serif; font-size:0.78rem; letter-spacing:1px; color:var(--muted); margin-top:4px; }
+.card-body { padding:20px; }
+
+/* WEEK NAV */
+.week-nav { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px; }
+.week-btn { font-family:'Barlow Condensed',sans-serif; font-size:0.73rem; letter-spacing:1px; padding:7px 12px; border:1.5px solid var(--border); background:var(--surface); color:var(--muted); cursor:pointer; transition:all 0.2s; border-radius:4px; -webkit-tap-highlight-color:transparent; }
+.week-btn.active { background:var(--gold); color:#fff; border-color:var(--gold); font-weight:700; }
+.week-btn.deload { color:var(--gold-dim); background:var(--gold-bg); }
+.week-btn.deload.active { background:var(--gold-dim); border-color:var(--gold-dim); color:#fff; }
+
+/* PROGRESS */
+.progress-wrap { margin-bottom:20px; }
+.progress-label { display:flex; justify-content:space-between; font-family:'Barlow Condensed',sans-serif; font-size:0.7rem; letter-spacing:2px; color:var(--muted); margin-bottom:6px; text-transform:uppercase; }
+.progress-bar { height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+.progress-fill { height:100%; background:linear-gradient(90deg,var(--gold-dim),var(--gold-light)); border-radius:2px; transition:width 0.5s ease; }
+
+/* DAY TABS */
+.day-tabs { display:flex; margin-bottom:16px; border-bottom:2px solid var(--border); overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.day-tabs::-webkit-scrollbar { display:none; }
+.day-tab { font-family:'Barlow Condensed',sans-serif; font-size:0.85rem; letter-spacing:1.5px; text-transform:uppercase; padding:11px 20px; border:none; background:transparent; color:var(--muted); cursor:pointer; transition:all 0.2s; position:relative; white-space:nowrap; -webkit-tap-highlight-color:transparent; }
+.day-tab::after { content:''; position:absolute; bottom:-2px; left:0; right:0; height:2px; background:var(--gold); transform:scaleX(0); transition:transform 0.2s; }
+.day-tab.active { color:var(--gold); font-weight:600; }
+.day-tab.active::after { transform:scaleX(1); }
+
+/* EXERCISES */
+.exercise-row { display:flex; align-items:center; padding:10px 0; border-bottom:1px solid var(--border-light); gap:10px; }
+.exercise-row:last-child { border-bottom:none; }
+.ex-num { font-family:'Barlow Condensed',sans-serif; font-size:0.68rem; color:var(--gold); width:18px; flex-shrink:0; font-weight:600; }
+.ex-name { font-family:'Barlow',sans-serif; font-size:0.9rem; font-weight:500; flex:1; color:var(--text2); }
+.ex-sets { font-family:'Barlow Condensed',sans-serif; font-size:0.75rem; color:var(--muted); letter-spacing:1px; width:60px; text-align:center; flex-shrink:0; }
+.ex-weight-wrap { position:relative; width:100px; flex-shrink:0; }
+.ex-weight { width:100%; background:var(--surface2); border:1.5px solid var(--border); border-radius:5px; color:var(--text); font-family:'Bebas Neue',sans-serif; font-size:1.05rem; padding:7px 26px 7px 9px; outline:none; transition:all 0.2s; -webkit-appearance:none; }
+.ex-weight:focus { border-color:var(--gold); background:var(--gold-bg); }
+.ex-weight.has-value { border-color:var(--gold-dim); color:var(--gold-dim); background:var(--gold-bg); }
+.ex-unit { position:absolute; right:7px; top:50%; transform:translateY(-50%); font-family:'Barlow Condensed',sans-serif; font-size:0.6rem; color:var(--muted); pointer-events:none; }
+
+/* NOTES */
+.notes-wrap { padding:14px 20px 20px; border-top:1px solid var(--border-light); background:var(--surface2); }
+.notes-label { font-family:'Barlow Condensed',sans-serif; font-size:0.6rem; letter-spacing:3px; color:var(--muted); text-transform:uppercase; margin-bottom:7px; }
+.notes-input { width:100%; background:var(--surface); border:1.5px solid var(--border); border-radius:6px; color:var(--text); font-family:'Barlow',sans-serif; font-size:0.85rem; padding:10px 12px; resize:vertical; min-height:60px; outline:none; transition:border-color 0.2s; }
+.notes-input:focus { border-color:var(--gold); }
+.notes-input::placeholder { color:#ccc; }
+
+/* NEXT WEEK BTN */
+.next-week-btn { width:100%; margin-top:16px; background:var(--gold); color:#fff; border:none; border-radius:8px; font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:3px; padding:16px; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:background 0.2s; }
+.next-week-btn:active { background:var(--gold-light); }
+
+/* WEEK HEADER */
+.week-header { margin-bottom:18px; }
+.week-title { font-family:'Bebas Neue',sans-serif; font-size:2.6rem; line-height:1; letter-spacing:2px; }
+.week-title span { color:var(--gold); }
+.week-quote { font-style:italic; font-size:0.88rem; color:var(--muted); padding-left:12px; border-left:3px solid var(--gold); margin-top:8px; }
+.deload-badge { display:inline-block; background:var(--gold-bg); color:var(--gold-dim); border:1px solid var(--gold-dim); font-family:'Barlow Condensed',sans-serif; font-size:0.6rem; letter-spacing:3px; padding:3px 8px; border-radius:3px; text-transform:uppercase; margin-left:10px; vertical-align:middle; }
+
+/* NUTRITION */
+.meal-row { display:flex; align-items:flex-start; padding:14px 0; border-bottom:1px solid var(--border-light); gap:14px; }
+.meal-row:last-child { border-bottom:none; }
+.meal-time { font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:1px; color:var(--gold); width:52px; flex-shrink:0; padding-top:2px; }
+.meal-info { flex:1; }
+.meal-name { font-family:'Barlow',sans-serif; font-size:0.9rem; font-weight:600; color:var(--text); margin-bottom:3px; }
+.meal-macros { font-family:'Barlow Condensed',sans-serif; font-size:0.75rem; color:var(--muted); letter-spacing:1px; }
+.meal-badge { display:inline-block; background:var(--gold-bg); color:var(--gold-dim); border:1px solid var(--gold-dim); font-family:'Barlow Condensed',sans-serif; font-size:0.6rem; letter-spacing:2px; padding:2px 7px; border-radius:3px; text-transform:uppercase; margin-left:8px; }
+
+.totals-row { display:flex; gap:10px; margin-top:4px; }
+.total-box { flex:1; background:var(--gold-bg); border:1px solid var(--border); border-radius:8px; padding:12px; text-align:center; }
+.total-val { font-family:'Bebas Neue',sans-serif; font-size:1.6rem; letter-spacing:1px; color:var(--gold); line-height:1; }
+.total-lbl { font-family:'Barlow Condensed',sans-serif; font-size:0.65rem; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-top:2px; }
+
+.day-toggle { display:flex; gap:0; margin-bottom:20px; background:var(--surface2); border:1.5px solid var(--border); border-radius:8px; padding:4px; }
+.day-toggle-btn { flex:1; font-family:'Barlow Condensed',sans-serif; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase; padding:10px 8px; border:none; background:transparent; color:var(--muted); cursor:pointer; border-radius:5px; transition:all 0.2s; -webkit-tap-highlight-color:transparent; }
+.day-toggle-btn.active { background:var(--gold); color:#fff; font-weight:700; }
+
+.tip-box { background:var(--gold-bg); border:1px solid var(--border); border-left:3px solid var(--gold); border-radius:6px; padding:12px 14px; margin-bottom:10px; font-family:'Barlow',sans-serif; font-size:0.84rem; color:var(--text2); }
+.tip-box strong { color:var(--gold-dim); }
+
+/* RETA */
+.reta-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.reta-week-badge { background:var(--gold); color:#fff; font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:2px; padding:6px 14px; border-radius:6px; }
+.reta-log-item { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-bottom:10px; display:flex; align-items:center; gap:14px; }
+.reta-log-date { font-family:'Barlow Condensed',sans-serif; font-size:0.78rem; letter-spacing:1px; color:var(--muted); text-transform:uppercase; width:80px; flex-shrink:0; }
+.reta-log-dose { font-family:'Bebas Neue',sans-serif; font-size:1.5rem; letter-spacing:1px; color:var(--gold); }
+.reta-log-unit { font-family:'Barlow Condensed',sans-serif; font-size:0.7rem; color:var(--muted); }
+.reta-log-note { font-family:'Barlow',sans-serif; font-size:0.82rem; color:var(--text2); flex:1; }
+.reta-log-btn { background:none; border:none; color:var(--red); cursor:pointer; font-size:1rem; padding:4px; -webkit-tap-highlight-color:transparent; }
+
+.reta-form { background:var(--surface); border:1.5px solid var(--gold-dim); border-radius:10px; padding:18px; margin-bottom:20px; }
+.reta-form-title { font-family:'Barlow Condensed',sans-serif; font-size:0.7rem; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:14px; }
+.form-row { display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+.form-group { flex:1; min-width:120px; }
+.form-label { font-family:'Barlow Condensed',sans-serif; font-size:0.65rem; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:5px; display:block; }
+.form-input { width:100%; background:var(--bg); border:1.5px solid var(--border); border-radius:6px; color:var(--text); font-family:'Barlow',sans-serif; font-size:0.9rem; padding:10px 12px; outline:none; transition:border-color 0.2s; -webkit-appearance:none; }
+.form-input:focus { border-color:var(--gold); }
+.form-btn { width:100%; background:var(--gold); color:#fff; border:none; border-radius:6px; font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:3px; padding:13px; cursor:pointer; transition:background 0.2s; -webkit-tap-highlight-color:transparent; }
+.form-btn:active { background:var(--gold-light); }
+
+.reta-stats { display:flex; gap:10px; margin-bottom:20px; }
+.reta-stat { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px; text-align:center; }
+.reta-stat-val { font-family:'Bebas Neue',sans-serif; font-size:1.6rem; color:var(--gold); line-height:1; }
+.reta-stat-lbl { font-family:'Barlow Condensed',sans-serif; font-size:0.62rem; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-top:2px; }
+
+.titration-table { width:100%; border-collapse:collapse; }
+.titration-table th { font-family:'Barlow Condensed',sans-serif; font-size:0.65rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); padding:8px 10px; text-align:left; border-bottom:2px solid var(--border); }
+.titration-table td { font-family:'Barlow',sans-serif; font-size:0.85rem; padding:10px; border-bottom:1px solid var(--border-light); color:var(--text2); }
+.titration-table tr.current-dose td { background:var(--gold-bg); color:var(--gold-dim); font-weight:600; }
+.titration-table td:first-child { font-family:'Barlow Condensed',sans-serif; letter-spacing:1px; }
+
+.section-title { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:2px; color:var(--text); margin-bottom:12px; margin-top:4px; }
+
+/* TOAST */
+.toast { position:fixed; bottom:calc(80px + var(--safe-bottom) + 10px); left:50%; transform:translateX(-50%) translateY(16px); background:var(--text); color:var(--surface); font-family:'Barlow Condensed',sans-serif; font-size:0.75rem; letter-spacing:2px; padding:10px 20px; border-radius:6px; opacity:0; transition:all 0.3s; z-index:999; white-space:nowrap; text-transform:uppercase; pointer-events:none; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.toast.green { background:var(--green); }
+
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.card { animation:fadeIn 0.2s ease; }
+
+@media (max-width:480px) {
+  .week-title { font-size:2rem; }
+  .sets-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <svg class="logo-icon" viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="48" stroke="#B8860B" stroke-width="4"/>
+      <polygon points="50,15 75,35 75,65 50,85 25,65 25,35" stroke="#B8860B" stroke-width="3" fill="none"/>
+      <polygon points="50,25 68,40 68,60 50,75 32,60 32,40" fill="#B8860B" opacity="0.15"/>
+      <rect x="43" y="40" width="14" height="3" fill="#B8860B"/>
+      <rect x="43" y="48" width="14" height="3" fill="#B8860B"/>
+      <rect x="43" y="56" width="14" height="3" fill="#B8860B"/>
+    </svg>
+    <div>
+      <div class="logo-text">ULTIMATE TRAINING</div>
+      <div class="logo-sub">Premium Edition</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;font-family:Barlow Condensed,sans-serif;font-size:0.68rem;letter-spacing:1px;color:var(--muted);text-transform:uppercase">
+    <div class="sync-dot" id="syncDot"></div>
+    <span id="syncText">Laden...</span>
+  </div>
+</header>
+
+<div class="container">
+  <!-- TRAINING TAB -->
+  <div id="tabTraining" class="tab-page active">
+    <div class="week-nav" id="weekNav"></div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Voortgang</span><span id="progressText">Week 1 / 12</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:8.3%"></div></div>
+    </div>
+    <div id="weekContent"></div>
+  </div>
+
+  <!-- NUTRITION TAB -->
+  <div id="tabVoeding" class="tab-page">
+    <div class="day-toggle">
+      <button class="day-toggle-btn active" id="btnRustdag" onclick="toggleDay('rust')">🛌 Rustdag</button>
+      <button class="day-toggle-btn" id="btnTrainingsdag" onclick="toggleDay('training')">🏋️ Trainingsdag</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-label">▶ Basisschema</div>
+        <div class="card-title">VOEDINGSSCHEMA</div>
+        <div class="card-sub">Retatrutide cyclus — vetverlies + spierbehoud</div>
+      </div>
+      <div class="card-body">
+        <div class="meal-row">
+          <div class="meal-time">10:00</div>
+          <div class="meal-info">
+            <div class="meal-name">250g magere kwark + 45g whey poeder</div>
+            <div class="meal-macros">⚡ 58g eiwit &nbsp;·&nbsp; 🔥 380 kcal</div>
+          </div>
+        </div>
+        <div class="meal-row">
+          <div class="meal-time">12:30</div>
+          <div class="meal-info">
+            <div class="meal-name">2 volkoren wraps + Philadelphia light + 6 plakjes kipfilet</div>
+            <div class="meal-macros">⚡ 30g eiwit &nbsp;·&nbsp; 🔥 400 kcal</div>
+          </div>
+        </div>
+        <div class="meal-row">
+          <div class="meal-time">15:00</div>
+          <div class="meal-info">
+            <div class="meal-name">Shake 1</div>
+            <div class="meal-macros">⚡ 28g eiwit &nbsp;·&nbsp; 🔥 120 kcal</div>
+          </div>
+        </div>
+        <div class="meal-row">
+          <div class="meal-time">17-18u</div>
+          <div class="meal-info">
+            <div class="meal-name">Avondeten <span class="meal-badge">Vrij</span></div>
+            <div class="meal-macros">⚡ ~35g eiwit &nbsp;·&nbsp; 🔥 ~500 kcal</div>
+          </div>
+        </div>
+        <div class="meal-row">
+          <div class="meal-time">20:00</div>
+          <div class="meal-info">
+            <div class="meal-name">Shake 2 of Ehrmann Hi-Protein mousse</div>
+            <div class="meal-macros">⚡ 27g eiwit &nbsp;·&nbsp; 🔥 135 kcal</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Training day extras -->
+    <div id="trainingExtras" style="display:none">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-label">▶ Extra op trainingsdagen</div>
+          <div class="card-title">TRAININGSVOEDING</div>
+        </div>
+        <div class="card-body">
+          <div class="meal-row">
+            <div class="meal-time">-45min</div>
+            <div class="meal-info">
+              <div class="meal-name">Banaan</div>
+              <div class="meal-macros">⚡ 1g eiwit &nbsp;·&nbsp; 🔥 90 kcal</div>
+            </div>
+          </div>
+          <div class="meal-row">
+            <div class="meal-time">Na train</div>
+            <div class="meal-info">
+              <div class="meal-name">XXL Hi-Protein reep <span class="meal-badge">Optie 1</span></div>
+              <div class="meal-macros">⚡ 25g eiwit &nbsp;·&nbsp; 🔥 290 kcal</div>
+            </div>
+          </div>
+          <div class="meal-row">
+            <div class="meal-time">Na train</div>
+            <div class="meal-info">
+              <div class="meal-name">130g gebakken kipfilet <span class="meal-badge">Optie 2 ⭐</span></div>
+              <div class="meal-macros">⚡ 38g eiwit &nbsp;·&nbsp; 🔥 140 kcal</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Totals -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-label">▶ Dagelijks totaal</div>
+        <div class="card-title" id="totalTitle">RUSTDAG</div>
+      </div>
+      <div class="card-body">
+        <div class="totals-row" id="totalsRow">
+          <div class="total-box"><div class="total-val">178g</div><div class="total-lbl">Eiwit</div></div>
+          <div class="total-box"><div class="total-val">1535</div><div class="total-lbl">Kcal</div></div>
+          <div class="total-box"><div class="total-val">3-4L</div><div class="total-lbl">Water</div></div>
+        </div>
+        <div style="margin-top:14px">
+          <div class="tip-box">💧 <strong>Water:</strong> Minimaal 3-4 liter per dag drinken.</div>
+          <div class="tip-box">🎯 <strong>Eiwitdoel:</strong> Min. 180g/dag, op trainingsdagen 200g+.</div>
+          <div class="tip-box">🍽️ <strong>Avondeten:</strong> Gewoon meeten met het gezin, niet beperken.</div>
+          <div class="tip-box">⭐ <strong>Tip:</strong> Kipfilet na training geeft meer eiwit en minder kcal dan de reep.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RETA TAB -->
+  <div id="tabReta" class="tab-page">
+
+    <!-- Stats -->
+    <div class="reta-stats">
+      <div class="reta-stat"><div class="reta-stat-val" id="statWeken">0</div><div class="reta-stat-lbl">Weken</div></div>
+      
+      <div class="reta-stat"><div class="reta-stat-val" id="statGewicht">—</div><div class="reta-stat-lbl">Huidig gewicht</div></div>
+      <div class="reta-stat"><div class="reta-stat-val" id="statVerlies">—</div><div class="reta-stat-lbl">Gewicht verlies</div></div>
+      <div class="reta-stat"><div class="reta-stat-val" id="statVerliesTaille">—</div><div class="reta-stat-lbl">Taille verlies</div></div>
+    </div>
+
+    <!-- Snelle referentie knoppen -->
+    <div style="display:flex;gap:8px;margin-bottom:20px">
+      <button onclick="toggleRef('dosering')" id="btnDosering" style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:11px 6px;font-family:Barlow Condensed,sans-serif;font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--text2);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all 0.2s">💊<br>Dosering</button>
+      <button onclick="toggleRef('reconstitutie')" id="btnReconstitutie" style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:11px 6px;font-family:Barlow Condensed,sans-serif;font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--text2);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all 0.2s">🧪<br>Aanmaken</button>
+      <button onclick="toggleRef('eenheden')" id="btnEenheden" style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:11px 6px;font-family:Barlow Condensed,sans-serif;font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--text2);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all 0.2s">💉<br>Eenheden</button>
+    </div>
+
+    <!-- Uitklapbare panelen -->
+    <div id="refDosering" style="display:none;margin-bottom:12px"></div>
+    <div id="refReconstitutie" style="display:none;margin-bottom:12px"></div>
+    <div id="refEenheden" style="display:none;margin-bottom:12px"></div>
+
+    <!-- Nieuw week toevoegen -->
+    <div class="reta-form">
+      <div class="reta-form-title">▶ Nieuwe week toevoegen</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Injectie datum (zondag)</label>
+          <input type="date" class="form-input" id="retaInjectieDatum">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Dosis (mg)</label>
+          <input type="number" class="form-input" id="retaDosis" placeholder="bijv. 1.5" step="0.5" inputmode="decimal">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Gewicht maandag (kg)</label>
+          <input type="number" class="form-input" id="retaGewicht" placeholder="bijv. 109.1" step="0.1" inputmode="decimal">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Taille maandag (cm)</label>
+          <input type="number" class="form-input" id="retaTaille" placeholder="bijv. 111.5" step="0.5" inputmode="decimal">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Notitie (optioneel)</label>
+          <input type="text" class="form-input" id="retaNotitie" placeholder="bijv. lichte misselijkheid">
+        </div>
+      </div>
+      <button class="form-btn" onclick="addRetaWeek()">✓ WEEK TOEVOEGEN</button>
+    </div>
+
+    <!-- Logboek -->
+    <div class="section-title">WEEKOVERZICHT</div>
+    <div id="retaLogList"></div>
+
+    <!-- Peptide referentie titel -->
+    <div class="section-title" style="margin-top:24px">PEPTIDE REFERENTIE</div>
+
+
+
+    <!-- Notities -->
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-header">
+        <div class="card-label">▶ Belangrijk</div>
+        <div class="card-title">NOTITIES</div>
+      </div>
+      <div class="card-body">
+        <div class="tip-box">💉 <strong>Tesa + Ipa combineren:</strong> Trek tesa op (10 eenheden), voeg ipa toe (10 eenheden) = 20 eenheden totaal in 1 spuit.</div>
+        <div class="tip-box">📅 <strong>5 on / 2 off:</strong> Maandag t/m vrijdag injecteren, zaterdag + zondag rust.</div>
+        <div class="tip-box">🌙 <strong>Timing:</strong> Altijd voor bed injecteren voor maximale GH puls tijdens slaap.</div>
+        <div class="tip-box">📈 <strong>Retatrutide ophogen:</strong> Naar 2mg (40 eenheden) vanaf zondag 26 april. Nieuwe vial + nieuw BAC water aanmaken op 26 april.</div>
+        <div class="tip-box">❄️ <strong>Bewaren:</strong> Alle vials in koelkast (2-8°C), donker — houdbaar 2 maanden na aanmaken mits niet troebel.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="navTraining" onclick="switchTab('Training')">
+    <span class="nav-icon">🏋️</span>Training
+  </button>
+  <button class="nav-btn" id="navVoeding" onclick="switchTab('Voeding')">
+    <span class="nav-icon">🥗</span>Voeding
+  </button>
+  <button class="nav-btn" id="navReta" onclick="switchTab('Reta')">
+    <span class="nav-icon">💉</span>Reta
+  </button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, enableIndexedDbPersistence }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCGuu-KRpAU3eClZGLGxMHi4J9yU3NpyyA",
+  authDomain: "ultimate-training-e9bd3.firebaseapp.com",
+  projectId: "ultimate-training-e9bd3",
+  storageBucket: "ultimate-training-e9bd3.firebasestorage.app",
+  messagingSenderId: "968143413971",
+  appId: "1:968143413971:web:876e3b7e6e7fd6147aaa26"
+};
+const fireApp = initializeApp(firebaseConfig);
+const db = getFirestore(fireApp);
+try { enableIndexedDbPersistence(db); } catch(e) {}
+
+// ======= STORAGE =======
+function save(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){}
+  debouncedSync();
+}
+function load(key, def) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e){ return def; }
+}
+
+// ======= SYNC =======
+let syncTimer = null;
+function setSyncStatus(state) {
+  const dot = document.getElementById('syncDot');
+  const txt = document.getElementById('syncText');
+  if (!dot || !txt) return;
+  dot.className = 'sync-dot ' + state;
+  txt.textContent = state === 'online' ? 'Gesync' : state === 'syncing' ? 'Syncing...' : 'Offline';
+}
+
+function getAllLocalData() {
+  const data = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('ut_')) {
+      try { data[key] = JSON.parse(localStorage.getItem(key)); } catch(e){}
+    }
+  }
+  return data;
+}
+
+async function syncUp() {
+  setSyncStatus('syncing');
+  try {
+    const data = getAllLocalData();
+    await setDoc(doc(db, 'training', 'user_data'), { data, updatedAt: new Date().toISOString() });
+    setSyncStatus('online');
+  } catch(e) { setSyncStatus('offline'); }
+}
+
+async function syncDown() {
+  setSyncStatus('syncing');
+  try {
+    const snap = await getDoc(doc(db, 'training', 'user_data'));
+    if (snap.exists()) {
+      const remoteData = snap.data().data || {};
+      // Remote data wins — overwrite all local ut_ keys
+      Object.keys(remoteData).forEach(key => {
+        try { localStorage.setItem(key, JSON.stringify(remoteData[key])); } catch(e){}
+      });
+    }
+    setSyncStatus('online');
+  } catch(e) {
+    setSyncStatus('offline');
+  }
+}
+
+function debouncedSync() {
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(syncUp, 1500);
+}
+
+// ======= TOAST =======
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type} show`;
+  clearTimeout(window._tt); window._tt = setTimeout(() => t.className = 'toast', 2000);
+}
+
+// ======= TAB SWITCHING =======
+function switchTab(name) {
+  ['Training','Voeding','Reta'].forEach(t => {
+    document.getElementById('tab'+t).classList.toggle('active', t===name);
+    document.getElementById('nav'+t).classList.toggle('active', t===name);
+  });
+  save('ut_active_tab', name);
+}
+
+// ======= PROGRAM DATA =======
+const HYPER = {
+  1:{q:"Spiergroei begint met consistentie.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","4×8-10"],["Incline DB Press","3×10-12"],["Lateral Raises","4×15-20"],["Cable Fly (laag naar hoog)","3×12-15"],["Overhead Triceps Extension","3×12-15"],["Triceps Rope Pushdown","3×15"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","4×8-10"],["Lat Pulldown","4×10-12"],["Seated Cable Row","3×12"],["Face Pulls","3×20"],["Incline DB Curl","3×12-15"],["Hammer Curl","3×15"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","4×8-10"],["Romanian Deadlift","3×10-12"],["Leg Press","3×12-15"],["Leg Extension","3×15"],["Hamstring Curl","3×15"],["Calf Raises","4×20"]]}},
+  2:{q:"Volume is de sleutel tot groei.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","4×8-10"],["Incline DB Press","3×10-12"],["Lateral Raises","4×15-20"],["Cable Fly (laag naar hoog)","3×12-15"],["Overhead Triceps Extension","3×12-15"],["Triceps Rope Pushdown","3×15"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","4×8-10"],["Lat Pulldown","4×10-12"],["Seated Cable Row","3×12"],["Face Pulls","3×20"],["Incline DB Curl","3×12-15"],["Hammer Curl","3×15"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","4×8-10"],["Romanian Deadlift","3×10-12"],["Leg Press","3×12-15"],["Leg Extension","3×15"],["Hamstring Curl","3×15"],["Calf Raises","4×20"]]}},
+  3:{q:"Elke set telt. Elke rep telt.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","4×8-10"],["Incline DB Press","4×10-12"],["Lateral Raises","4×15-20"],["Cable Fly (laag naar hoog)","3×12-15"],["Overhead Triceps Extension","3×12-15"],["Triceps Rope Pushdown","3×15"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","4×8-10"],["Lat Pulldown","4×10-12"],["Seated Cable Row","4×12"],["Face Pulls","3×20"],["Incline DB Curl","3×12-15"],["Hammer Curl","3×15"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","4×8-10"],["Romanian Deadlift","4×10-12"],["Leg Press","3×12-15"],["Leg Extension","3×15"],["Hamstring Curl","3×15"],["Calf Raises","4×20"]]}},
+  4:{q:"Herstel is ook training.",dl:true,A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","3×10-12"],["Incline DB Press","3×12"],["Lateral Raises","3×15"],["Cable Fly (laag naar hoog)","3×15"],["Overhead Triceps Extension","2×15"],["Triceps Rope Pushdown","2×15"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","3×10"],["Lat Pulldown","3×12"],["Seated Cable Row","3×12"],["Face Pulls","3×20"],["Incline DB Curl","2×15"],["Hammer Curl","2×15"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","3×10"],["Romanian Deadlift","3×12"],["Leg Press","3×15"],["Leg Extension","2×15"],["Hamstring Curl","2×15"],["Calf Raises","3×20"]]}},
+  5:{q:"Zwaarder. Sterker. Groter.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","4×6-8"],["Incline DB Press","4×8-10"],["Lateral Raises","4×15-20"],["Cable Fly (laag naar hoog)","3×10-12"],["Overhead Triceps Extension","3×10-12"],["Triceps Rope Pushdown","3×12"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","4×6-8"],["Lat Pulldown","4×8-10"],["Seated Cable Row","4×10"],["Face Pulls","4×20"],["Incline DB Curl","3×10-12"],["Hammer Curl","3×12"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","4×6-8"],["Romanian Deadlift","4×8-10"],["Leg Press","4×10-12"],["Leg Extension","3×12"],["Hamstring Curl","3×12"],["Calf Raises","4×20"]]}},
+  6:{q:"Progressie is geen toeval.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","4×6-8"],["Incline DB Press","4×8-10"],["Lateral Raises","4×15-20"],["Cable Fly (laag naar hoog)","3×10-12"],["Overhead Triceps Extension","3×10-12"],["Triceps Rope Pushdown","3×12"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","4×6-8"],["Lat Pulldown","4×8-10"],["Seated Cable Row","4×10"],["Face Pulls","4×20"],["Incline DB Curl","3×10-12"],["Hammer Curl","3×12"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","4×6-8"],["Romanian Deadlift","4×8-10"],["Leg Press","4×10-12"],["Leg Extension","3×12"],["Hamstring Curl","3×12"],["Calf Raises","4×20"]]}},
+  7:{q:"Jij vs gisteren. Win elke dag.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","5×6-8"],["Incline DB Press","4×8-10"],["Lateral Raises","4×15-20"],["Cable Fly (laag naar hoog)","3×10-12"],["Overhead Triceps Extension","3×10-12"],["Triceps Rope Pushdown","3×12"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","5×6-8"],["Lat Pulldown","4×8-10"],["Seated Cable Row","4×10"],["Face Pulls","4×20"],["Incline DB Curl","3×10-12"],["Hammer Curl","3×12"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","5×6-8"],["Romanian Deadlift","4×8-10"],["Leg Press","4×10-12"],["Leg Extension","3×12"],["Hamstring Curl","3×12"],["Calf Raises","4×20"]]}},
+  8:{q:"Rust is deel van het plan.",dl:true,A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","3×10"],["Incline DB Press","3×12"],["Lateral Raises","3×15"],["Cable Fly (laag naar hoog)","3×15"],["Overhead Triceps Extension","2×15"],["Triceps Rope Pushdown","2×15"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","3×10"],["Lat Pulldown","3×12"],["Seated Cable Row","3×12"],["Face Pulls","3×20"],["Incline DB Curl","2×15"],["Hammer Curl","2×15"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","3×10"],["Romanian Deadlift","3×12"],["Leg Press","3×15"],["Leg Extension","2×15"],["Hamstring Curl","2×15"],["Calf Raises","3×20"]]}},
+  9:{q:"De laatste fase. Alles geven.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","5×5-8"],["Incline DB Press","4×8-10"],["Lateral Raises","5×15-20"],["Cable Fly (laag naar hoog)","4×10-12"],["Overhead Triceps Extension","4×10-12"],["Triceps Rope Pushdown","4×12"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","5×5-8"],["Lat Pulldown","4×8-10"],["Seated Cable Row","4×10"],["Face Pulls","4×20"],["Incline DB Curl","4×10-12"],["Hammer Curl","4×12"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","5×5-8"],["Romanian Deadlift","4×8-10"],["Leg Press","4×10-12"],["Leg Extension","4×12"],["Hamstring Curl","4×12"],["Calf Raises","5×20"]]}},
+  10:{q:"Maximum volume. Maximum resultaat.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","5×5-8"],["Incline DB Press","4×8-10"],["Lateral Raises","5×15-20"],["Cable Fly (laag naar hoog)","4×10-12"],["Overhead Triceps Extension","4×10-12"],["Triceps Rope Pushdown","4×12"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","5×5-8"],["Lat Pulldown","4×8-10"],["Seated Cable Row","4×10"],["Face Pulls","4×20"],["Incline DB Curl","4×10-12"],["Hammer Curl","4×12"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","5×5-8"],["Romanian Deadlift","4×8-10"],["Leg Press","4×10-12"],["Leg Extension","4×12"],["Hamstring Curl","4×12"],["Calf Raises","5×20"]]}},
+  11:{q:"Nog twee weken. Geef alles.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","5×5-8"],["Incline DB Press","5×8-10"],["Lateral Raises","5×15-20"],["Cable Fly (laag naar hoog)","4×10-12"],["Overhead Triceps Extension","4×10-12"],["Triceps Rope Pushdown","4×12"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","5×5-8"],["Lat Pulldown","5×8-10"],["Seated Cable Row","4×10"],["Face Pulls","4×20"],["Incline DB Curl","4×10-12"],["Hammer Curl","4×12"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","5×5-8"],["Romanian Deadlift","5×8-10"],["Leg Press","4×10-12"],["Leg Extension","4×12"],["Hamstring Curl","4×12"],["Calf Raises","5×20"]]}},
+  12:{q:"Laatste week. Laat zien wie je bent.",A:{n:"PUSH",s:"Borst · Schouders · Triceps",a:[["Bench Press","5×5-8"],["Incline DB Press","5×8-10"],["Lateral Raises","5×15-20"],["Cable Fly (laag naar hoog)","4×10-12"],["Overhead Triceps Extension","4×10-12"],["Triceps Rope Pushdown","4×12"]]},B:{n:"PULL",s:"Rug · Biceps · Rear Delt",a:[["Deadlift (matig)","5×5-8"],["Lat Pulldown","5×8-10"],["Seated Cable Row","4×10"],["Face Pulls","4×20"],["Incline DB Curl","4×10-12"],["Hammer Curl","4×12"]]},C:{n:"LEGS",s:"Quads · Hamstrings · Glutes",a:[["Squat","5×5-8"],["Romanian Deadlift","5×8-10"],["Leg Press","4×10-12"],["Leg Extension","4×12"],["Hamstring Curl","4×12"],["Calf Raises","5×20"]]}}
+};
+
+// ======= TRAINING STATE =======
+let cW = load('ut_week', 1);
+let cD = load('ut_day', 'A');
+let weights = load('ut_weights', {});
+
+function getWeight(w, d, i) {
+  const key = `w${w}_${d}_${i}`;
+  if (weights[key]) return weights[key];
+  // Carry over from previous weeks
+  for (let prev = w - 1; prev >= 1; prev--) {
+    const prevKey = `w${prev}_${d}_${i}`;
+    if (weights[prevKey]) return weights[prevKey];
+  }
+  return '';
+}
+
+function saveWeight(w, d, i, val) {
+  weights[`w${w}_${d}_${i}`] = val;
+  save('ut_weights', weights);
+}
+
+function buildNav() {
+  const nav = document.getElementById('weekNav');
+  nav.innerHTML = '';
+  for (let w = 1; w <= 12; w++) {
+    const isDeload = HYPER[w] && HYPER[w].dl;
+    const b = document.createElement('button');
+    b.className = `week-btn${isDeload?' deload':''}${w===cW?' active':''}`;
+    b.textContent = `W${w}${isDeload?' ·D':''}`;
+    b.onclick = () => showWeek(w);
+    nav.appendChild(b);
+  }
+}
+
+function showWeek(w) {
+  cW = w;
+  save('ut_week', w);
+  buildNav();
+  document.getElementById('progressText').textContent = `Week ${w} / 12`;
+  document.getElementById('progressFill').style.width = `${(w/12)*100}%`;
+  renderWeek();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function renderWeek() {
+  const wk = HYPER[cW]; if(!wk) return;
+  const badge = wk.dl ? '<span class="deload-badge">Deload</span>' : '';
+  const tabs = ['A','B','C'];
+  const labels = ['Push','Pull','Legs'];
+  document.getElementById('weekContent').innerHTML = `
+    <div class="week-header">
+      <div class="week-title"><span>WEEK</span> ${cW}${badge}</div>
+      <div class="week-quote">${wk.q}</div>
+    </div>
+    <div class="day-tabs">
+      ${tabs.map((d,i) => `<button class="day-tab${cD===d?' active':''}" onclick="switchDay('${d}')">${labels[i]}</button>`).join('')}
+    </div>
+    <div id="dayContent"></div>
+    ${cW < 12 ? `<button class="next-week-btn" onclick="showWeek(${cW+1})">▶ NAAR WEEK ${cW+1}</button>` : ''}`;
+  renderDay();
+}
+
+function switchDay(d) {
+  cD = d;
+  save('ut_day', d);
+  renderWeek();
+}
+
+function renderDay() {
+  const day = HYPER[cW][cD];
+  const w = cW, d = cD;
+
+  const acc = day.a.map(([name, sets], i) => {
+    const sv = getWeight(w, d, i);
+    return `<div class="exercise-row">
+      <span class="ex-num">${i+1}</span>
+      <span class="ex-name">${name}</span>
+      <span class="ex-sets">${sets}</span>
+      <div class="ex-weight-wrap">
+        <input type="number" class="ex-weight${sv?' has-value':''}" placeholder="—" value="${sv}"
+          oninput="onWeightInput(this,${w},'${d}',${i})" step="2.5" inputmode="decimal">
+        <span class="ex-unit">KG</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  const noteKey = `note_w${w}_${d}`;
+  const noteVal = load(noteKey, '');
+
+  document.getElementById('dayContent').innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <div class="card-label">▶ ${day.n}</div>
+        <div class="card-title">${day.n}</div>
+        <div class="card-sub">${day.s}</div>
+      </div>
+      <div class="card-body">${acc}</div>
+      <div class="notes-wrap">
+        <div class="notes-label">Notities</div>
+        <textarea class="notes-input" placeholder="Hoe voelde de training? PR's? Opmerkingen..."
+          oninput="saveNote('${noteKey}',this.value)">${noteVal}</textarea>
+      </div>
+    </div>`;
+}
+
+function onWeightInput(el, w, d, i) {
+  const val = el.value;
+  saveWeight(w, d, i, val);
+  el.classList.toggle('has-value', val.length > 0);
+}
+
+function saveNote(key, val) {
+  save(key, val);
+}
+
+// ======= NUTRITION =======
+let nutritionDay = 'rust';
+function toggleDay(type) {
+  nutritionDay = type;
+  document.getElementById('btnRustdag').classList.toggle('active', type==='rust');
+  document.getElementById('btnTrainingsdag').classList.toggle('active', type==='training');
+  document.getElementById('trainingExtras').style.display = type==='training' ? 'block' : 'none';
+  document.getElementById('totalTitle').textContent = type==='training' ? 'TRAININGSDAG' : 'RUSTDAG';
+  document.getElementById('totalsRow').innerHTML = type==='training'
+    ? `<div class="total-box"><div class="total-val">204g</div><div class="total-lbl">Eiwit (reep)</div></div>
+       <div class="total-box"><div class="total-val">217g</div><div class="total-lbl">Eiwit (kip)</div></div>
+       <div class="total-box"><div class="total-val">1765-1915</div><div class="total-lbl">Kcal</div></div>`
+    : `<div class="total-box"><div class="total-val">178g</div><div class="total-lbl">Eiwit</div></div>
+       <div class="total-box"><div class="total-val">1535</div><div class="total-lbl">Kcal</div></div>
+       <div class="total-box"><div class="total-val">3-4L</div><div class="total-lbl">Water</div></div>`;
+}
+
+// ======= RETA =======
+// Preload existing data from screenshot
+let retaLogs = load('ut_reta_v2', null);
+if (!retaLogs) {
+  retaLogs = [
+    {injectie:'2025-03-29', dosis:1.0, gewicht:114.1, taille:116, notitie:'Start'},
+    {injectie:'2025-04-05', dosis:1.0, gewicht:111.6, taille:114.5, notitie:''},
+    {injectie:'2025-04-12', dosis:1.5, gewicht:110.0, taille:113, notitie:''},
+    {injectie:'2025-04-19', dosis:1.5, gewicht:109.1, taille:111.5, notitie:''},
+  ];
+  save('ut_reta_v2', retaLogs);
+}
+
+function formatDate(d) {
+  if (!d) return '—';
+  const [y,m,day] = d.split('-');
+  return `${day}-${m}-${y}`;
+}
+
+function renderRetaStats() {
+  const n = retaLogs.length;
+  if (n === 0) {
+    document.getElementById('statWeken').textContent = '0';
+    document.getElementById('statDosis').textContent = '—';
+    document.getElementById('statGewicht').textContent = '—';
+    document.getElementById('statVerlies').textContent = '—';
+    return;
+  }
+  const last = retaLogs[n-1];
+  const first = retaLogs[0];
+  const verlies = first.gewicht && last.gewicht ? (parseFloat(last.gewicht) - parseFloat(first.gewicht)).toFixed(1) : '—';
+  const verliesTaille = first.taille && last.taille ? (parseFloat(last.taille) - parseFloat(first.taille)).toFixed(1) : '—';
+  document.getElementById('statWeken').textContent = n;
+  
+  document.getElementById('statGewicht').textContent = last.gewicht ? last.gewicht + ' kg' : '—';
+  document.getElementById('statVerlies').textContent = verlies !== '—' ? verlies + ' kg' : '—';
+  document.getElementById('statVerliesTaille').textContent = verliesTaille !== '—' ? verliesTaille + ' cm' : '—';
+}
+
+function renderRetaLogs() {
+  const list = document.getElementById('retaLogList');
+  if (retaLogs.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:var(--muted);font-family:Barlow Condensed,sans-serif;letter-spacing:2px;padding:30px;font-size:0.85rem;">NOG GEEN WEKEN GEREGISTREERD</div>';
+    return;
+  }
+  list.innerHTML = [...retaLogs].reverse().map((log, ri) => {
+    const i = retaLogs.length - 1 - ri;
+    const weekNr = i + 1;
+    const isLast = i === retaLogs.length - 1;
+
+    // Gewichtsverlies vs vorige week
+    let verliesGewicht = '';
+    if (i > 0 && retaLogs[i-1].gewicht && log.gewicht) {
+      const diff = (parseFloat(log.gewicht) - parseFloat(retaLogs[i-1].gewicht)).toFixed(1);
+      const color = parseFloat(diff) < 0 ? 'var(--green)' : 'var(--red)';
+      verliesGewicht = `<span style="color:${color};font-weight:700;margin-left:6px">${parseFloat(diff) > 0 ? '+' : ''}${diff} kg</span>`;
+    }
+
+    // Taille verlies vs vorige week
+    let verliesTaille = '';
+    if (i > 0 && retaLogs[i-1].taille && log.taille) {
+      const diff = (parseFloat(log.taille) - parseFloat(retaLogs[i-1].taille)).toFixed(1);
+      const color = parseFloat(diff) < 0 ? 'var(--green)' : 'var(--red)';
+      verliesTaille = `<span style="color:${color};font-weight:700;margin-left:6px">${parseFloat(diff) > 0 ? '+' : ''}${diff} cm</span>`;
+    }
+
+    return `<div class="card" style="margin-bottom:12px${isLast ? ';border:1.5px solid var(--gold-dim)' : ''}">
+      <div class="card-header" style="padding:13px 16px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="card-label">Week ${weekNr}${isLast ? ' · Huidig' : ''}</div>
+            <div style="font-family:Bebas Neue,sans-serif;font-size:1.5rem;letter-spacing:1px;color:var(--text);line-height:1">${log.dosis} mg <span style="font-size:0.85rem;color:var(--muted);font-family:Barlow,sans-serif;font-weight:400">retatrutide</span></div>
+          </div>
+          <button onclick="deleteRetaWeek(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:1rem;padding:8px;-webkit-tap-highlight-color:transparent;opacity:0.6">✕</button>
+        </div>
+      </div>
+      <div class="card-body" style="padding:12px 16px">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-light)">
+            <span style="font-size:1.1rem">💉</span>
+            <div>
+              <div style="font-family:Barlow Condensed,sans-serif;font-size:0.62rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase">Injectie (zondag)</div>
+              <div style="font-family:Barlow,sans-serif;font-size:0.95rem;font-weight:600;color:var(--text2)">${formatDate(log.injectie)}</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-light)">
+            <span style="font-size:1.1rem">⚖️</span>
+            <div>
+              <div style="font-family:Barlow Condensed,sans-serif;font-size:0.62rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase">Gewicht (maandag)</div>
+              <div style="font-family:Barlow,sans-serif;font-size:0.95rem;font-weight:600;color:var(--text2)">${log.gewicht ? log.gewicht + ' kg' : '—'}${verliesGewicht}</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0${log.notitie ? ';border-bottom:1px solid var(--border-light)' : ''}">
+            <span style="font-size:1.1rem">📏</span>
+            <div>
+              <div style="font-family:Barlow Condensed,sans-serif;font-size:0.62rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase">Taille (maandag)</div>
+              <div style="font-family:Barlow,sans-serif;font-size:0.95rem;font-weight:600;color:var(--text2)">${log.taille ? log.taille + ' cm' : '—'}${verliesTaille}</div>
+            </div>
+          </div>
+          ${log.notitie ? `<div style="display:flex;align-items:center;gap:10px;padding:8px 0">
+            <span style="font-size:1.1rem">📝</span>
+            <div>
+              <div style="font-family:Barlow Condensed,sans-serif;font-size:0.62rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase">Notitie</div>
+              <div style="font-family:Barlow,sans-serif;font-size:0.9rem;color:var(--text2)">${log.notitie}</div>
+            </div>
+          </div>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addRetaWeek() {
+  const injectie = document.getElementById('retaInjectieDatum').value;
+  const dosis = document.getElementById('retaDosis').value;
+  if (!injectie || !dosis) { toast('Vul injectiedatum en dosis in!'); return; }
+  retaLogs.push({
+    injectie: injectie,
+    dosis: parseFloat(dosis),
+    gewicht: document.getElementById('retaGewicht').value || '',
+    taille: document.getElementById('retaTaille').value || '',
+    notitie: document.getElementById('retaNotitie').value || ''
+  });
+  retaLogs.sort((a,b) => a.injectie.localeCompare(b.injectie));
+  save('ut_reta_v2', retaLogs);
+  document.getElementById('retaDosis').value = '';
+  document.getElementById('retaGewicht').value = '';
+  document.getElementById('retaTaille').value = '';
+  document.getElementById('retaNotitie').value = '';
+  renderRetaLogs();
+  renderRetaStats();
+  toast('✓ Week toegevoegd!', 'green');
+}
+
+function deleteRetaWeek(i) {
+  if (!confirm('Verwijder week ' + (i+1) + '?')) return;
+  retaLogs.splice(i, 1);
+  save('ut_reta_v2', retaLogs);
+  renderRetaLogs();
+  renderRetaStats();
+}
+
+// ======= INIT =======
+// Sync from Firebase on load
+syncDown().then(() => {
+  // Re-render after sync to show latest data
+  renderWeek();
+  renderRetaLogs();
+  renderRetaStats();
+});
+
+window.switchTab = switchTab;
+window.switchDay = switchDay;
+window.showWeek = showWeek;
+window.toggleDay = toggleDay;
+window.addRetaWeek = addRetaWeek;
+window.deleteRetaWeek = deleteRetaWeek;
+window.saveNote = saveNote;
+window.onWeightInput = onWeightInput;
+// Set today's date in reta form
+document.getElementById('retaInjectieDatum').value = new Date().toISOString().split('T')[0];
+
+// Restore last tab
+const savedTab = load('ut_active_tab', 'Training');
+switchTab(savedTab);
+
+// Init training
+buildNav();
+renderWeek();
+document.getElementById('progressText').textContent = `Week ${cW} / 12`;
+document.getElementById('progressFill').style.width = `${(cW/12)*100}%`;
+
+// ======= COLLAPSIBLE REF PANELS =======
+const REF_CONTENT = {
+  dosering: `<div class="card"><div class="card-header"><div class="card-label">▶ Schema</div><div class="card-title">DOSERINGSSCHEMA</div></div><div class="card-body" style="padding:0"><table style="width:100%;border-collapse:collapse"><thead><tr style="background:var(--gold-bg)"><th style="font-family:Barlow Condensed,sans-serif;font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:left;border-bottom:2px solid var(--border)">Peptide</th><th style="font-family:Barlow Condensed,sans-serif;font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:left;border-bottom:2px solid var(--border)">Dosis</th><th style="font-family:Barlow Condensed,sans-serif;font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:left;border-bottom:2px solid var(--border)">Wanneer</th><th style="font-family:Barlow Condensed,sans-serif;font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:left;border-bottom:2px solid var(--border)">Freq.</th></tr></thead><tbody><tr style="border-bottom:1px solid var(--border-light)"><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;font-weight:700;color:var(--gold-dim)">Retatrutide</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">2mg</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">Zondagavond</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">1x/week</td></tr><tr style="border-bottom:1px solid var(--border-light)"><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;font-weight:700;color:var(--gold-dim)">Tesamorelin</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">1mg (10 eenheden)</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">Voor bed</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">5 on / 2 off</td></tr><tr><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;font-weight:700;color:var(--gold-dim)">Ipamorelin</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">250mcg (10 eenheden)</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">Voor bed (zelfde spuit)</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">5 on / 2 off</td></tr></tbody></table></div></div>`,
+  reconstitutie: `<div class="card"><div class="card-header"><div class="card-label">▶ Aanmaken</div><div class="card-title">RECONSTITUTIE</div><div class="card-sub">Bewaren: 2-8°C, donker, max. 2 maanden</div></div><div class="card-body" style="padding:0"><table style="width:100%;border-collapse:collapse"><thead><tr style="background:var(--gold-bg)"><th style="font-family:Barlow Condensed,sans-serif;font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:left;border-bottom:2px solid var(--border)">Peptide</th><th style="font-family:Barlow Condensed,sans-serif;font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:left;border-bottom:2px solid var(--border)">Vial</th><th style="font-family:Barlow Condensed,sans-serif;font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:left;border-bottom:2px solid var(--border)">BAC water</th><th style="font-family:Barlow Condensed,sans-serif;font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:left;border-bottom:2px solid var(--border)">Concentratie</th></tr></thead><tbody><tr style="border-bottom:1px solid var(--border-light)"><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;font-weight:700;color:var(--gold-dim)">Retatrutide</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">10mg</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">2ml</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">5mg/ml</td></tr><tr style="border-bottom:1px solid var(--border-light)"><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;font-weight:700;color:var(--gold-dim)">Tesamorelin</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">10mg</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">1ml</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">10mg/ml</td></tr><tr><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;font-weight:700;color:var(--gold-dim)">Ipamorelin</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">5mg</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">2ml</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">2,5mg/ml</td></tr></tbody></table></div></div>`,
+  eenheden: `<div class="card"><div class="card-header"><div class="card-label">▶ Berekening</div><div class="card-title">EENHEDEN PER INJECTIE</div><div class="card-sub">Insulinespuit referentie</div></div><div class="card-body" style="padding:0"><table style="width:100%;border-collapse:collapse"><thead><tr style="background:var(--gold-bg)"><th style="font-family:Barlow Condensed,sans-serif;font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:left;border-bottom:2px solid var(--border)">Peptide</th><th style="font-family:Barlow Condensed,sans-serif;font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:left;border-bottom:2px solid var(--border)">Dosis</th><th style="font-family:Barlow Condensed,sans-serif;font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:left;border-bottom:2px solid var(--border)">Eenheden</th></tr></thead><tbody><tr style="border-bottom:1px solid var(--border-light)"><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;font-weight:700;color:var(--gold-dim)">Retatrutide</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">2mg</td><td style="padding:11px 12px;font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--gold)">40 eenheden</td></tr><tr style="border-bottom:1px solid var(--border-light)"><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;font-weight:700;color:var(--gold-dim)">Tesamorelin</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">1mg</td><td style="padding:11px 12px;font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--gold)">10 eenheden</td></tr><tr style="border-bottom:1px solid var(--border-light)"><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;font-weight:700;color:var(--gold-dim)">Ipamorelin</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">250mcg</td><td style="padding:11px 12px;font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--gold)">10 eenheden</td></tr><tr><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;font-weight:700;color:var(--gold-dim)">Tesa + Ipa</td><td style="padding:11px 12px;font-family:Barlow,sans-serif;font-size:0.88rem;color:var(--text2)">Gecombineerd</td><td style="padding:11px 12px;font-family:Bebas Neue,sans-serif;font-size:1.1rem;color:var(--gold)">20 eenheden</td></tr></tbody></table></div></div>`
+};
+
+const refState = {dosering: false, reconstitutie: false, eenheden: false};
+
+window.toggleRef = function(key) {
+  // Close others
+  Object.keys(refState).forEach(k => {
+    if (k !== key && refState[k]) {
+      refState[k] = false;
+      document.getElementById('ref' + k.charAt(0).toUpperCase() + k.slice(1)).style.display = 'none';
+      const btn = document.getElementById('btn' + k.charAt(0).toUpperCase() + k.slice(1));
+      btn.style.background = 'var(--surface)';
+      btn.style.borderColor = 'var(--border)';
+      btn.style.color = 'var(--text2)';
+    }
+  });
+  refState[key] = !refState[key];
+  const panel = document.getElementById('ref' + key.charAt(0).toUpperCase() + key.slice(1));
+  const btn = document.getElementById('btn' + key.charAt(0).toUpperCase() + key.slice(1));
+  if (refState[key]) {
+    panel.innerHTML = REF_CONTENT[key];
+    panel.style.display = 'block';
+    btn.style.background = 'var(--gold)';
+    btn.style.borderColor = 'var(--gold)';
+    btn.style.color = '#fff';
+  } else {
+    panel.style.display = 'none';
+    btn.style.background = 'var(--surface)';
+    btn.style.borderColor = 'var(--border)';
+    btn.style.color = 'var(--text2)';
+  }
+};
+
+// Init reta
+renderRetaLogs();
+renderRetaStats();
+</script>
+</body>
+</html>
